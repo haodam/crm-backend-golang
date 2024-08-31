@@ -1,17 +1,12 @@
 package main
 
-import (
-	"net/http"
-
-	"github.com/gin-gonic/gin"
-)
+import "github.com/haodam/user-backend-golang/pkg/transports/https/routers"
 
 func main() {
-	r := gin.Default()
-	r.GET("/ping", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "pong",
-		})
-	})
-	r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
+
+	r := routers.NewRouter()
+	err := r.Run()
+	if err != nil {
+		return
+	} // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 }
