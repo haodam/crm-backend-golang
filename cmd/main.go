@@ -1,12 +1,43 @@
 package main
 
 import (
-	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
-	"os"
+	"fmt"
+	"github.com/spf13/viper"
 )
 
+type ServiceConfigs struct {
+	Server struct {
+		Port int `mapstructure:"port"`
+	} `mapstructure:"server"`
+
+	Database []struct {
+		User     string `mapstructure:"user"`
+		Password string `mapstructure:"password"`
+		Host     string `mapstructure:"host"`
+	} `mapstructure:"database"`
+}
+
 func main() {
+
+	viper := viper.New()
+	viper.AddConfigPath("../configs/")
+	viper.SetConfigName("local")
+	viper.SetConfigType("yaml")
+
+	// read configuration
+	err := viper.ReadInConfig()
+	if err != nil {
+		panic(fmt.Errorf("Fatal error config file: %s \n", err))
+	}
+
+	// read server configuration
+	fmt.Println("Server Port::", viper.GetInt("server.port"))
+	fmt.Println("Server Host:", viper.GetString("security.jwt.key"))
+
+	var config ServiceConfigs
+	if err := viper.Unmarshal(&config); err != nil {
+		fmt.Printf("unable to decode into struct, %v\n", err)
+	}
 
 	//r := routers.NewRouter()
 	//err := r.Run()
@@ -29,40 +60,12 @@ func main() {
 	//logger, _ = zap.NewProduction()
 	//logger.Info("Hello NewProductionLogger")
 
-	encoder := getEncoderLog()
-	sync := getWriterSync()
-	core := zapcore.NewCore(encoder, sync, zapcore.InfoLevel)
-	logger := zap.New(core, zap.AddCaller())
+	//encoder := getEncoderLog()
+	//sync := getWriterSync()
+	//core := zapcore.NewCore(encoder, sync, zapcore.InfoLevel)
+	//logger := zap.New(core, zap.AddCaller())
+	//
+	//logger.Info("Info logger", zap.Int("line", 1))
+	//logger.Error("Error logger", zap.Int("line", 1))
 
-	logger.Info("Info logger", zap.Int("line", 1))
-	logger.Error("Error logger", zap.Int("line", 1))
-
-}
-
-// format log
-func getEncoderLog() zapcore.Encoder {
-	encoderConfig := zap.NewProductionEncoderConfig()
-
-	// 1725434785.4335027 -> 2024-09-04T14:26:25.431+0700
-	encoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
-
-	// ts -> Time
-	encoderConfig.EncodeLevel = zapcore.CapitalLevelEncoder
-
-	// "caller": -> cmd/main.go:29 ->
-	encoderConfig.EncodeCaller = zapcore.ShortCallerEncoder
-
-	return zapcore.NewJSONEncoder(encoderConfig)
-}
-
-func getWriterSync() zapcore.WriteSyncer {
-	// Open the file with the correct flags
-	file, _ := os.OpenFile("./log/log.txt", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
-	//if err != nil {
-	//	// Handle error (e.g., log it or panic)
-	//	panic(err)
-	//}
-	syncFile := zapcore.AddSync(file)
-	syncConsole := zapcore.AddSync(os.Stderr)
-	return zapcore.NewMultiWriteSyncer(syncConsole, syncFile)
 }

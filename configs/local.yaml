@@ -6,4 +6,5 @@ database:
   host: localhost
   dbName: shopDEV
 security:
-  key: abc123
+  jwt:
+    key: abc123
