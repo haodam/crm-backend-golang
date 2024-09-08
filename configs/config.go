@@ -5,7 +5,11 @@ import (
 	"github.com/spf13/viper"
 )
 
-type ServiceConfigs struct {
+type Config struct {
+	MySQLConfigs string `mapstructure:"mysql_configs"`
+}
+
+type MySQLConfigs struct {
 	Host            string `mapstructure:"host"`
 	Port            int    `mapstructure:"port"`
 	Username        string `mapstructure:"username"`
@@ -16,7 +20,7 @@ type ServiceConfigs struct {
 	ConnMaxLifeTime int    `mapstructure:"conn_max_life_time"`
 }
 
-func MustLoadConfig(configPath string) *ServiceConfigs {
+func MustLoadConfig(configPath string) *Config {
 
 	viper := viper.New()
 	viper.AddConfigPath(configPath)
@@ -33,10 +37,10 @@ func MustLoadConfig(configPath string) *ServiceConfigs {
 	fmt.Println("Server Port::", viper.GetInt("server.port"))
 	fmt.Println("Server Host:", viper.GetString("server.host"))
 
-	var config ServiceConfigs
+	var config Config
 	if err := viper.Unmarshal(&config); err != nil {
 		fmt.Printf("unable to decode into struct, %v\n", err)
 	}
-	return &ServiceConfigs{}
+	return &Config{}
 
 }
