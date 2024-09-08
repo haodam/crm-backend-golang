@@ -6,8 +6,8 @@ database:
   username: root
   password: root1234
   dbname: shopDevGo
-  maxIdleCons: 10
-  maxOpenCoons: 100
+  maxIdleConns: 10
+  maxOpenConns: 100
   connMaxLifetime: 3600
 
 
