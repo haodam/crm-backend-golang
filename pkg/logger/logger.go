@@ -6,6 +6,11 @@ import (
 	"os"
 )
 
+func NewLogger() {
+	//encoder := getEncoderLog()
+	//core := zapcore.NewCore(encoder, os.Stdout, zapcore.DebugLevel)
+}
+
 // format log
 func getEncoderLog() zapcore.Encoder {
 	encoderConfig := zap.NewProductionEncoderConfig()

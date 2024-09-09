@@ -9,7 +9,7 @@ import (
 func MustLoadConfig() {
 
 	viper := viper.New()
-	viper.AddConfigPath("../../conf/")
+	viper.AddConfigPath("./configs/")
 	viper.SetConfigName("local")
 	viper.SetConfigType("yaml")
 
@@ -27,4 +27,5 @@ func MustLoadConfig() {
 	if err := viper.Unmarshal(&global.Config); err != nil {
 		fmt.Printf("unable to decode into struct, %v\n", err)
 	}
+
 }

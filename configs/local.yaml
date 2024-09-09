@@ -3,11 +3,11 @@ server:
 database:
   host: 127.0.0.1
   port: 33306
-  username: root
-  password: root1234
-  dbname: shopDevGo
+  username: "root"
+  password: "root1234"
+  dbname: "shopDevGo"
   maxIdleConns: 10
   maxOpenConns: 100
-  connMaxLifetime: 3600
+  connMaxLifeTime: 3600
 
 
