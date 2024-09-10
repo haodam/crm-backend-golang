@@ -3,11 +3,22 @@ server:
 database:
   host: 127.0.0.1
   port: 33306
-  username: "root"
-  password: "root1234"
-  dbname: "shopDevGo"
+  username: root
+  password: root1234
+  dbname: shopDevGo
   maxIdleConns: 10
   maxOpenConns: 100
   connMaxLifeTime: 3600
+logger:
+  log_level: debug
+  file_log_name: "./log/dev001.log"
+  max_size: 500
+  max_backups: 3
+  max_age: 28
+  compress: true
+
+
+
+
 
 
