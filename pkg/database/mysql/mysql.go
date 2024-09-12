@@ -3,6 +3,7 @@ package mysql
 import (
 	"fmt"
 	"github.com/haodam/user-backend-golang/global"
+	"github.com/haodam/user-backend-golang/internal/modules/user/entity"
 	"go.uber.org/zap"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -31,6 +32,9 @@ func InitMysql() {
 
 	// Set Pool
 	SetPool()
+
+	// MigrateTables
+	migrateTables()
 }
 
 // Mo nhom ket noi , giup cai thien hieu suat
@@ -49,5 +53,11 @@ func SetPool() {
 }
 
 func migrateTables() {
-
+	err := global.Mdb.AutoMigrate(
+		&entity.Role{},
+		&entity.User{},
+	)
+	if err != nil {
+		fmt.Println("migrate tables failed", zap.Error(err))
+	}
 }
