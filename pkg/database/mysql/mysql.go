@@ -18,22 +18,19 @@ func checkErrPanic(err error, errString string) {
 }
 
 func InitMysql() {
-
-	var m = global.Config.Mysql
+	m := global.Config.Mysql
 	// refer https://github.com/go-sql-driver/mysql#dsn-data-source-name for details
 	dsn := "%s:%s@tcp(%s:%v)/%s?charset=utf8mb4&parseTime=True&loc=Local"
 	var s = fmt.Sprintf(dsn, m.Username, m.Password, m.Host, m.Port, m.Dbname)
-	db, err := gorm.Open(mysql.Open(s), &gorm.Config{})
-	if err != nil {
-		checkErrPanic(err, "InitMysql initiaLization error")
-	}
-	global.Logger.Info("InitMysql Successfully")
+	db, err := gorm.Open(mysql.Open(s), &gorm.Config{
+		SkipDefaultTransaction: false,
+	})
+	checkErrPanic(err, "InitMysql initialization error")
+	global.Logger.Info("Initializing MySQL Successfully")
 	global.Mdb = db
 
-	// Set Pool
+	// set Pool
 	SetPool()
-
-	// MigrateTables
 	migrateTables()
 }
 
@@ -48,7 +45,7 @@ func SetPool() {
 	}
 	sqlDb.SetMaxIdleConns(m.MaxIdleConns)
 	sqlDb.SetMaxOpenConns(m.MaxOpenConns)
-	sqlDb.SetConnMaxLifetime(time.Duration(m.ConnMaxLifeTime) * time.Second)
+	sqlDb.SetConnMaxLifetime(time.Duration(m.ConnMaxLifeTime))
 
 }
 

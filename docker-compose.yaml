@@ -3,21 +3,21 @@ version: '3.9'
 services:
   mysql:
     image: mysql:8.0
-    container_name: mysql_container
+    container_name: demo_mysql_container
     environment:
       MYSQL_ROOT_PASSWORD: root1234
-      MYSQL_DATABASE: shopdevgo
-      MYSQL_USER: crm_user
+      MYSQL_DATABASE: shop123
+      MYSQL_USER: root
       MYSQL_PASSWORD: root1234
     ports:
       - "30306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
-      - ./init:/docker-entrypoint-initdb.d"
+      - ./init:/docker-entrypoint-initdb.d
 
   redis:
     image: redis:7.0
-    container_name: redis_container
+    container_name: demo_redis_container
     ports:
       - "6379:6379"
     volumes:
@@ -33,7 +33,7 @@ services:
       - mysql
       - redis
     ports:
-      - "8008:8002"
+      - "8008:8082"
 
 volumes:
   mysql_data:

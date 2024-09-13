@@ -1,19 +1,19 @@
 server:
   port: 8082
 database:
-  host: mysql_container
+  host: demo_mysql_container
   port: 3306
   username: root
   password: root1234
-  dbname: shopDevGo
+  dbname: shop123
   maxIdleConns: 10
   maxOpenConns: 100
   connMaxLifeTime: 3600
 redis:
-  host: redis_container
+  host: demo_redis_container
   port: 6379
   password:
-  database:
+  database: 0
 logger:
   log_level: debug
   file_log_name: "./log/dev001.log"
