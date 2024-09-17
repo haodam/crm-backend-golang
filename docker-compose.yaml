@@ -6,11 +6,10 @@ services:
     container_name: demo_mysql_container
     environment:
       MYSQL_ROOT_PASSWORD: root1234
-      MYSQL_DATABASE: shop123
-      MYSQL_USER: root
+      MYSQL_DATABASE: shop1234
       MYSQL_PASSWORD: root1234
     ports:
-      - "30306:3306"
+      - "33306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
       - ./init:/docker-entrypoint-initdb.d
@@ -19,12 +18,12 @@ services:
     image: redis:7.0
     container_name: demo_redis_container
     ports:
-      - "6379:6379"
+      - "6331:6379"
     volumes:
       - redis_data:/data
 
   crm.shopdev.com:
-    container_name: go_backend_crm_shopdev
+    container_name: go_backend_crm_shop1234
     build:
       context: .
       dockerfile: Dockerfile

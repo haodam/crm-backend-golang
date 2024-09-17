@@ -14,7 +14,7 @@ COPY ./deploy/conf /deploy/conf
 
 COPY --from=builder /build/crm.shopdev.com /
 
-ENTRYPOINT ["/crm.shopdev.com", "deploy/conf/local.yaml"]
+ENTRYPOINT [ "/crm.shopdev.com", "deploy/conf/local.yaml" ]
 
 
 
