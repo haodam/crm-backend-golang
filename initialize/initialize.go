@@ -1,12 +1,12 @@
-package utils
+package initialize
 
 import (
 	"fmt"
-	"github.com/haodam/user-backend-golang/configs"
 	"github.com/haodam/user-backend-golang/global"
 	"github.com/haodam/user-backend-golang/pkg/database/mysql"
 	"github.com/haodam/user-backend-golang/pkg/logger"
 	"github.com/haodam/user-backend-golang/pkg/transports/https/routers"
+	"github.com/haodam/user-backend-golang/utils/configs"
 	"go.uber.org/zap"
 )
 

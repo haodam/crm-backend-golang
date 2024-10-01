@@ -1,7 +1,9 @@
 package main
 
-import "github.com/haodam/user-backend-golang/utils"
+import (
+	"github.com/haodam/user-backend-golang/initialize"
+)
 
 func main() {
-	utils.Initialize()
+	initialize.Initialize()
 }
