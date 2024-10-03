@@ -10,11 +10,11 @@ RUN go build -o crm.shopdev.com ./cmd
 
 FROM scratch
 
-COPY ./deploy/conf /deploy/conf
+COPY ./configs /configs
 
 COPY --from=builder /build/crm.shopdev.com /
 
-ENTRYPOINT [ "/crm.shopdev.com", "deploy/conf/local.yaml" ]
+ENTRYPOINT [ "/crm.shopdev.com", "configs/local.yaml" ]
 
 
 

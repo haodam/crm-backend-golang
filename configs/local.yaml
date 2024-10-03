@@ -12,7 +12,7 @@ database:
   connMaxLifeTime: 3600
 redis:
   host: 127.0.0.1
-  port: 6331
+  port: 6381
   password:
   database: 0
 logger:
