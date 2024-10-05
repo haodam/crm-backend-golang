@@ -1,19 +1,21 @@
 package manager
 
-//type UserRouter struct{}
-//
-//func (us *UserRouter) InitUserRouter(Router *gin.RouterGroup) {
-//
-//	// Public user
-//	userRouterPublic := Router.Group("user")
-//	{
-//		userRouterPublic.POST("/register")
-//	}
-//
-//	//Private user
-//	userRouterPrivate := Router.Group("user")
-//	{
-//		userRouterPrivate.GET("/get_info")
-//	}
-//
-//}
+import "github.com/gin-gonic/gin"
+
+type UserRouter struct{}
+
+func (pr *UserRouter) InitUserRouter(Router *gin.RouterGroup) {
+	// public router
+	userRouterPucblic := Router.Group("/admin/user")
+	{
+		userRouterPucblic.POST("/register")
+	}
+	// private router
+	userRouterPrivate := Router.Group("/admin/user")
+	// userRouterPrivate.Use(Limiter())
+	// userRouterPrivate.Use(Authen())
+	// userRouterPrivate.Use(Permission())
+	{
+		userRouterPrivate.POST("/active_user")
+	}
+}
