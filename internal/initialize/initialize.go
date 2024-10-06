@@ -6,7 +6,6 @@ import (
 	"github.com/haodam/user-backend-golang/pkg/database/mysql"
 	"github.com/haodam/user-backend-golang/pkg/logger"
 	"github.com/haodam/user-backend-golang/pkg/redis"
-	"github.com/haodam/user-backend-golang/pkg/transports/https/routers"
 	"github.com/haodam/user-backend-golang/utils/configs"
 	"go.uber.org/zap"
 )
@@ -22,7 +21,7 @@ func Initialize() {
 	mysql.InitMysql()
 	redis.InitRedis()
 
-	r := routers.NewRouter()
+	r := InitRouter()
 	err := r.Run(":8082")
 	if err != nil {
 		return
