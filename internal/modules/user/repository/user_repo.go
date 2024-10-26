@@ -1,14 +1,14 @@
 package repository
 
-type IUserRepository interface {
+type IUserRegisterRepository interface {
 	GetUserByEmail(email string) bool
 }
 
 type userRepositoryImpl struct{}
 
-var _ IUserRepository = (*userRepositoryImpl)(nil)
+var _ IUserRegisterRepository = (*userRepositoryImpl)(nil)
 
-func NewUserRepository() IUserRepository {
+func NewUserRepository() IUserRegisterRepository {
 	return &userRepositoryImpl{}
 }
 
