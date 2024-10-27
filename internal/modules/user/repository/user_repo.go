@@ -1,7 +1,10 @@
 package repository
 
+import "context"
+
 type IUserRegisterRepository interface {
-	GetUserByEmail(email string) bool
+	GetUserByEmail(ctx context.Context, email string) bool
+	FindUserByEmail(ctx context.Context, email string) bool
 }
 
 type userRepositoryImpl struct{}
@@ -12,6 +15,10 @@ func NewUserRepository() IUserRegisterRepository {
 	return &userRepositoryImpl{}
 }
 
-func (u *userRepositoryImpl) GetUserByEmail(email string) bool {
+func (u *userRepositoryImpl) GetUserByEmail(ctx context.Context, email string) bool {
+	return false
+}
+
+func (u *userRepositoryImpl) FindUserByEmail(ctx context.Context, email string) bool {
 	return false
 }

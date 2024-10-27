@@ -26,7 +26,7 @@ func (us *userServiceUseCase) Execute(ctx context.Context, email string, purpose
 	// step 1: Hash email (ma hoa 1 chieu)
 
 	// step 2: check email exists
-	if us.useRepository.GetUserByEmail(email) {
+	if us.useRepository.FindUserByEmail(ctx, email) {
 		return 1
 	}
 
