@@ -12,11 +12,12 @@ import (
 	"github.com/haodam/user-backend-golang/internal/modules/user/usecase"
 )
 
-// Injectors from user_wire.go:
+// Injectors from user_wire.go: huydeptraivaiz
 
 func InitUserRouterHandler() (*handler.UserHandler, error) {
-	iUserRepository := repository.NewUserRepository()
-	iUserService := usecase.NewUserService(iUserRepository)
-	userHandler := handler.NewUserHandler(iUserService)
+	iUserRegisterRepository := repository.NewUserRepository()
+	iOtpRegisterRepository := repository.NewOtpRegisterRepository()
+	iUserRegisterService := usecase.NewUserService(iUserRegisterRepository, iOtpRegisterRepository)
+	userHandler := handler.NewUserHandler(iUserRegisterService)
 	return userHandler, nil
 }

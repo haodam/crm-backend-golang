@@ -6,10 +6,10 @@ import (
 )
 
 type UserHandler struct {
-	userhandler usecase.IUserService
+	userhandler usecase.IUserRegisterService
 }
 
-func NewUserHandler(userhandler usecase.IUserService) *UserHandler {
+func NewUserHandler(userhandler usecase.IUserRegisterService) *UserHandler {
 	return &UserHandler{
 		userhandler: userhandler,
 	}
