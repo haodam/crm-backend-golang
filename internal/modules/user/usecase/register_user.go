@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"github.com/haodam/user-backend-golang/internal/modules/user/repository"
 	"github.com/haodam/user-backend-golang/utils/random"
+	"github.com/haodam/user-backend-golang/utils/sendto"
+	"strconv"
 	"time"
 )
 
@@ -48,6 +50,10 @@ func (us *userServiceUseCase) Execute(ctx context.Context, email string, purpose
 	}
 
 	// step 5: send email OTP
+	err = sendto.SendTextEmailOtp([]string{email}, "damanhhao3004@gmail.com", strconv.Itoa(otp))
+	if err != nil {
+		fmt.Println(err)
+	}
 	// step 6: check OTP is available
 	// step 7: check spam OTP
 	return 0
