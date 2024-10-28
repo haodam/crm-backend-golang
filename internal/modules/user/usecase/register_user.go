@@ -50,7 +50,9 @@ func (us *userServiceUseCase) Execute(ctx context.Context, email string, purpose
 	}
 
 	// step 5: send email OTP
-	err = sendto.SendTextEmailOtp([]string{email}, "damanhhao3004@gmail.com", strconv.Itoa(otp))
+	err = sendto.SendTemplateEmailOtp([]string{email}, "damanhhao3004@gmail.com", "email-otp.html", map[string]interface{}{
+		"otp": strconv.Itoa(otp),
+	})
 	if err != nil {
 		fmt.Println(err)
 	}

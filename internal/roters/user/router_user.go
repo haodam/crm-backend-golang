@@ -2,23 +2,22 @@ package user
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/haodam/user-backend-golang/internal/modules/user/handler"
-	"github.com/haodam/user-backend-golang/internal/modules/user/repository"
-	"github.com/haodam/user-backend-golang/internal/modules/user/usecase"
+	"github.com/haodam/user-backend-golang/internal/wire"
 )
 
 type RouterUser struct{}
 
 func (us *RouterUser) InitUserRouter(Router *gin.RouterGroup) {
 
-	ur := repository.NewUserRepository()
-	userService := usecase.NewUserService(ur)
-	userHanderNonDenpency := handler.NewUserHandler(userService)
+	//ur := repository.NewUserRepository()
+	//userService := usecase.NewUserService(ur, nil)
+	//userHanderNonDenpency := handler.NewUserRegisterHandler(userService)
+	userHandler, _ := wire.InitUserRouterHandler()
 
 	// Public user
 	userRouterPublic := Router.Group("user")
 	{
-		userRouterPublic.POST("/register", userHanderNonDenpency.Register)
+		userRouterPublic.POST("/register", userHandler.UserRegisterHandler)
 	}
 
 	//Private user

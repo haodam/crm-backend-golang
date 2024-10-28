@@ -9,12 +9,12 @@ import (
 	"github.com/haodam/user-backend-golang/internal/modules/user/usecase"
 )
 
-func InitUserRouterHandler() (*handler.UserHandler, error) {
+func InitUserRouterHandler() (*handler.UserRegisterHandler, error) {
 	wire.Build(
 		repository.NewUserRepository,
 		repository.NewOtpRegisterRepository,
 		usecase.NewUserService,
-		handler.NewUserHandler,
+		handler.NewUserRegisterHandler,
 	)
-	return new(handler.UserHandler), nil
+	return new(handler.UserRegisterHandler), nil
 }
