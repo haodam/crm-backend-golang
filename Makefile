@@ -15,5 +15,8 @@ reset:
 run:
 	go run .\cmd\main.go
 
+sql:
+	sqlc generate
 
-.PHONY: run up down reset
+
+.PHONY: run up down reset sql
