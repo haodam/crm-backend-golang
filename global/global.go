@@ -1,6 +1,7 @@
 package global
 
 import (
+	"database/sql"
 	"github.com/haodam/user-backend-golang/pkg/logger"
 	"github.com/haodam/user-backend-golang/pkg/setting"
 	"github.com/redis/go-redis/v9"
@@ -12,4 +13,5 @@ var (
 	Logger *logger.ZapLogger
 	Rdb    *redis.Client
 	Mdb    *gorm.DB
+	Mdbc   *sql.DB
 )
