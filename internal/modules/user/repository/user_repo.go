@@ -7,7 +7,8 @@ type IUserRegisterRepository interface {
 	FindUserByEmail(ctx context.Context, email string) bool
 }
 
-type userRepositoryImpl struct{}
+type userRepositoryImpl struct {
+}
 
 var _ IUserRegisterRepository = (*userRepositoryImpl)(nil)
 
