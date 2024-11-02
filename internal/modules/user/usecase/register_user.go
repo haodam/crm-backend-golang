@@ -56,6 +56,11 @@ func (us *userServiceUseCase) Execute(ctx context.Context, email string, purpose
 	if err != nil {
 		fmt.Println(err)
 	}
+	// Send email API Java
+	err = sendto.SendMailToJavaByAPI(strconv.Itoa(otp), email, "email-otp.html")
+	if err != nil {
+		fmt.Println(err)
+	}
 	// step 6: check OTP is available
 	// step 7: check spam OTP
 	return 0
