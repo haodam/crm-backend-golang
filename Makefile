@@ -21,8 +21,8 @@ reset:
 run:
 	go run .\cmd\main.go
 
-sql:
+sql_gen:
 	sqlc generate
 
 
-.PHONY: run up down reset sql create_migration up_by_one
+.PHONY: run up down reset sql_gen create_migration up_by_one

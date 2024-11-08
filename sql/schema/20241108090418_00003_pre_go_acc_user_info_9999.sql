@@ -14,11 +14,11 @@ CREATE TABLE IF NOT EXISTS pre_go_acc_user_info_9999 (
 
     user_is_authentication TINYINT UNSIGNED NOT NULL COMMENT 'Authentication status: 0-Not Authenticated, 1-Pending, 2-Authenticated, 3-Failed', -- Authentication status (enum)
 
-    -- Add timestamps for record creation and updates
+-- Add timestamps for record creation and updates
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT 'Record creation time', -- Time when the record was created
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Record update time', -- Time when the record was last updated
 
-    -- Indexes for optimized querying
+-- Indexes for optimized querying
     UNIQUE KEY unique_user_account (user_account), -- Ensure user_account is unique
     INDEX idx_user_mobile (user_mobile), -- Index for querying by user_mobile
     INDEX idx_user_email (user_email), -- Index for querying by user_email
