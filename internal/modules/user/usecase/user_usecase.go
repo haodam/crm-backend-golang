@@ -7,8 +7,8 @@ import (
 
 type (
 	IUserLogin interface {
-		Register(ctx context.Context, arg *entity.RegisterInput) (codeResult int, err error)
-		Login(ctx context.Context, arg *entity.LoginInput) (codeResult int, out *entity.LoginOutput, err error)
+		Register(ctx context.Context, req entity.RegisterInput) (codeResult int, err error)
+		Login(ctx context.Context, arg entity.LoginInput) (codeResult int, out *entity.LoginOutput, err error)
 	}
 
 	IUserInfo interface {
