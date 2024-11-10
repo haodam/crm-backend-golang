@@ -3,7 +3,7 @@ package common
 type Error struct {
 	Message      string
 	DebugMessage string
-	Code         string
+	Code         int
 }
 
 func (e *Error) Error() string {
@@ -14,6 +14,6 @@ func (e *Error) Debug() string {
 	return e.DebugMessage
 }
 
-func (e *Error) ErrCode() string {
+func (e *Error) ErrCode() int {
 	return e.Code
 }
