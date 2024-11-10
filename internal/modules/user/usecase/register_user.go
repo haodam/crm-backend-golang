@@ -19,15 +19,19 @@ import (
 	"time"
 )
 
+type IUserRegister interface {
+	Register(ctx context.Context, req *entity.RegisterInput) *common.Error
+}
+
 type registerUserUseCase struct {
 	d *database.Queries
 }
 
-func newRegisterUserUseCase(d *database.Queries) *registerUserUseCase {
+func NewRegisterUserUseCase(d *database.Queries) IUserRegister {
 	return &registerUserUseCase{d: d}
 }
 
-//var _ IUserLogin = (*registerUserUseCase)(nil)
+var _ IUserRegister = (*registerUserUseCase)(nil)
 
 func (r registerUserUseCase) Register(ctx context.Context, req *entity.RegisterInput) *common.Error {
 
