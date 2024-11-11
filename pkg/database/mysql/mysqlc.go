@@ -23,7 +23,7 @@ func InitMysqlC() {
 	db, err := sql.Open("mysql", s)
 	checkErrorPanicC(err, "InitMysql initialization error")
 	global.Logger.Info("Initializing MySQL Successfully sql")
-	global.Mdbc = db
+	global.MdbC = db
 
 	// set Pool
 	SetPool()

@@ -7,7 +7,6 @@ import (
 	"github.com/haodam/user-backend-golang/common"
 	"github.com/haodam/user-backend-golang/global"
 	"github.com/haodam/user-backend-golang/internal/modules/user"
-	"github.com/haodam/user-backend-golang/internal/modules/user/entity"
 	database "github.com/haodam/user-backend-golang/internal/modules/user/repository"
 	"github.com/haodam/user-backend-golang/utils/crypto"
 	"github.com/haodam/user-backend-golang/utils/random"
@@ -20,7 +19,7 @@ import (
 )
 
 type IUserRegister interface {
-	Register(ctx context.Context, req *entity.RegisterInput) *common.Error
+	Register(ctx context.Context, VerifyKey string, VerifyType int, VerifyPurpose string) *common.Error
 }
 
 type registerUserUseCase struct {
@@ -33,19 +32,23 @@ func NewRegisterUserUseCase(d *database.Queries) IUserRegister {
 
 var _ IUserRegister = (*registerUserUseCase)(nil)
 
-func (r registerUserUseCase) Register(ctx context.Context, req *entity.RegisterInput) *common.Error {
+// VerifyKey     string `json:"verify_key"`
+// VerifyType    int    `json:"verify_type"`
+// VerifyPurpose string `json:"verify_purpose"`
+
+func (r registerUserUseCase) Register(ctx context.Context, VerifyKey string, VerifyType int, VerifyPurpose string) *common.Error {
 
 	// Step1: Hash Email
-	fmt.Printf("VerifyKey: %s\n", req.VerifyKey)
-	fmt.Printf("VerifyType: %d\n", req.VerifyType)
-	hashKey := crypto.GetHash(strings.ToLower(req.VerifyKey))
+	fmt.Printf("VerifyKey: %s\n", VerifyKey)
+	fmt.Printf("VerifyType: %d\n", VerifyType)
+	hashKey := crypto.GetHash(strings.ToLower(VerifyKey))
 	fmt.Printf("hashKey: %s\n", hashKey)
 
 	// Step2: Check user exists in uer base
-	userFound, err := r.d.CheckUserBaseExists(ctx, req.VerifyKey)
+	userFound, err := r.d.CheckUserBaseExists(ctx, VerifyKey)
 	if err != nil {
 		return &common.Error{
-			Message:      fmt.Sprintf("user %v already exists", req.VerifyKey),
+			Message:      fmt.Sprintf("user %v already exists", VerifyKey),
 			DebugMessage: err.Error(),
 			Code:         ErrCodeUserHasExists,
 		}
@@ -53,7 +56,7 @@ func (r registerUserUseCase) Register(ctx context.Context, req *entity.RegisterI
 	// check email already registered (example@gmail.com)
 	if userFound > 0 {
 		return &common.Error{
-			Message: fmt.Sprintf("user %v already registered", req.VerifyKey),
+			Message: fmt.Sprintf("user %v already registered", VerifyKey),
 			Code:    ErrCodeUserHasExists,
 		}
 	}
@@ -66,7 +69,7 @@ func (r registerUserUseCase) Register(ctx context.Context, req *entity.RegisterI
 	case err == nil:
 		fmt.Println("Key doesn't exist")
 	case err != nil:
-		fmt.Println("get otp for user failed", req.VerifyKey)
+		fmt.Println("get otp for user failed", VerifyKey)
 		return &common.Error{
 			DebugMessage: err.Error(),
 			Code:         ErrInvalidOTP,
@@ -80,7 +83,7 @@ func (r registerUserUseCase) Register(ctx context.Context, req *entity.RegisterI
 
 	// Step4: Generate OTP
 	otpNew := random.GenerateSixDigOtp()
-	if req.VerifyPurpose == "TEST_USER" {
+	if VerifyPurpose == "TEST_USER" {
 		otpNew = 123456 // Hard code
 	}
 	fmt.Printf("OTP is :::%d\n", otpNew)
@@ -94,10 +97,10 @@ func (r registerUserUseCase) Register(ctx context.Context, req *entity.RegisterI
 		}
 	}
 	// Step6: Send OTP
-	switch req.VerifyType {
+	switch VerifyType {
 	case user.EMAIL:
 		// Hard code to email (example@gmail.com)
-		err := sendto.SendTextEmailOtp([]string{req.VerifyKey}, user.HOST_EMAIL, strconv.Itoa(otpNew))
+		err := sendto.SendTextEmailOtp([]string{VerifyKey}, user.HOST_EMAIL, strconv.Itoa(otpNew))
 		if err != nil {
 			return &common.Error{
 				DebugMessage: err.Error(),
@@ -107,7 +110,7 @@ func (r registerUserUseCase) Register(ctx context.Context, req *entity.RegisterI
 		// Step7: Save OTP to MYSQL
 		result, err := r.d.InsertOTPVerify(ctx, database.InsertOTPVerifyParams{
 			VerifyOtp:     strconv.Itoa(otpNew),
-			VerifyKey:     req.VerifyKey,
+			VerifyKey:     VerifyKey,
 			VerifyKeyHash: hashKey,
 			VerifyType:    sql.NullInt32{Int32: 1, Valid: true},
 		})

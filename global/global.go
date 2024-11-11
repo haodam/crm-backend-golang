@@ -13,5 +13,5 @@ var (
 	Logger *logger.ZapLogger
 	Rdb    *redis.Client
 	Mdb    *gorm.DB
-	Mdbc   *sql.DB
+	MdbC   *sql.DB
 )
