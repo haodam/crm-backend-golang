@@ -14,7 +14,12 @@ func (u *userHandlerImpl) HandleUserRegister(ctx *gin.Context) {
 		common.ResponseErr(ctx, http.StatusBadRequest)
 		return
 	}
-	err := u.registerUserUseCase.Register(ctx.Request.Context(), params.VerifyKey, params.VerifyType, params.VerifyPurpose)
+	err := u.registerUserUseCase.Register(
+		ctx.Request.Context(),
+		params.VerifyKey,
+		params.VerifyType,
+		params.VerifyPurpose)
+
 	if err != nil {
 		common.ResponseErr(ctx, http.StatusInternalServerError)
 		return
