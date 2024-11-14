@@ -1,6 +1,7 @@
 package user
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/haodam/user-backend-golang/internal/wire"
 )
@@ -13,11 +14,12 @@ func (us *RouterUser) InitUserRouter(Router *gin.RouterGroup) {
 	//userService := usecase.NewUserService(ur, nil)
 	//userHanderNonDenpency := handler.NewUserRegisterHandler(userService)
 	userHandler, _ := wire.InitUserRouterHandler()
+	fmt.Println(userHandler)
 
 	// Public user
 	userRouterPublic := Router.Group("user")
 	{
-		userRouterPublic.POST("/register", userHandler.UserRegisterHandler)
+		userRouterPublic.POST("/register", nil)
 	}
 
 	//Private user
