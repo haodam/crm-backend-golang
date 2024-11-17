@@ -4,10 +4,10 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"github.com/haodam/user-backend-golang/common"
 	"github.com/haodam/user-backend-golang/global"
 	"github.com/haodam/user-backend-golang/internal/modules/user"
 	database "github.com/haodam/user-backend-golang/internal/modules/user/repository"
+	"github.com/haodam/user-backend-golang/pkg/response"
 	"github.com/haodam/user-backend-golang/utils/crypto"
 	"github.com/haodam/user-backend-golang/utils/random"
 	"github.com/haodam/user-backend-golang/utils/sendto"
@@ -19,7 +19,7 @@ import (
 )
 
 type IUserRegister interface {
-	Register(ctx context.Context, VerifyKey string, VerifyType int, VerifyPurpose string) *common.Error
+	Register(ctx context.Context, VerifyKey string, VerifyType int, VerifyPurpose string) (codeResult int, err error)
 }
 
 type registerUserUseCase struct {
@@ -36,7 +36,7 @@ var _ IUserRegister = (*registerUserUseCase)(nil)
 // VerifyType    int    `json:"verify_type"` 1 la dang ky bang email , 2 la dang ky bang so dt
 // VerifyPurpose string `json:"verify_purpose"` TEST_USER
 
-func (r registerUserUseCase) Register(ctx context.Context, VerifyKey string, VerifyType int, VerifyPurpose string) *common.Error {
+func (r registerUserUseCase) Register(ctx context.Context, VerifyKey string, VerifyType int, VerifyPurpose string) (codeResult int, err error) {
 
 	// Step1: Hash Email
 	fmt.Printf("VerifyKey: %s\n", VerifyKey)
@@ -47,18 +47,11 @@ func (r registerUserUseCase) Register(ctx context.Context, VerifyKey string, Ver
 	// Step2: Check user exists in uer base
 	userFound, err := r.d.CheckUserBaseExists(ctx, VerifyKey)
 	if err != nil {
-		return &common.Error{
-			Message:      fmt.Sprintf("user %v already exists", VerifyKey),
-			DebugMessage: err.Error(),
-			Code:         ErrCodeUserHasExists,
-		}
+		return response.ErrCodeUserHasExists, err
 	}
 	// check email already registered (example@gmail.com)
 	if userFound > 0 {
-		return &common.Error{
-			Message: fmt.Sprintf("user %v already registered", VerifyKey),
-			Code:    ErrCodeUserHasExists,
-		}
+		return response.ErrCodeUserHasExists, fmt.Errorf("user has already registered")
 	}
 
 	// Step3: Create OTP
@@ -70,15 +63,8 @@ func (r registerUserUseCase) Register(ctx context.Context, VerifyKey string, Ver
 		fmt.Println("Key doesn't exist")
 	case err != nil:
 		fmt.Println("get otp for user failed", VerifyKey)
-		return &common.Error{
-			DebugMessage: err.Error(),
-			Code:         ErrInvalidOTP,
-		}
 	case otpFound != "":
-		return &common.Error{
-			DebugMessage: otpFound,
-			Code:         ErrCodeOtpNotExists,
-		}
+		return response.ErrCodeOtpNotExists, fmt.Errorf("")
 	}
 
 	// Step4: Generate OTP
@@ -91,10 +77,7 @@ func (r registerUserUseCase) Register(ctx context.Context, VerifyKey string, Ver
 	// Step5: Save OTP in Redis with expiration time
 	err = global.Rdb.SetEx(ctx, userKey, strconv.Itoa(otpNew), time.Duration(2)*time.Minute).Err()
 	if err != nil {
-		return &common.Error{
-			DebugMessage: err.Error(),
-			Code:         ErrInvalidOTP,
-		}
+		return response.ErrInvalidOTP, err
 	}
 	// Step6: Send OTP
 	switch VerifyType {
@@ -102,10 +85,7 @@ func (r registerUserUseCase) Register(ctx context.Context, VerifyKey string, Ver
 		// Hard code to email (example@gmail.com)
 		err := sendto.SendTextEmailOtp([]string{VerifyKey}, user.HOST_EMAIL, strconv.Itoa(otpNew))
 		if err != nil {
-			return &common.Error{
-				DebugMessage: err.Error(),
-				Code:         ErrSendEmailOtp,
-			}
+			return response.ErrSendEmailOtp, err
 		}
 		// Step7: Save OTP to MYSQL
 		result, err := r.d.InsertOTPVerify(ctx, database.InsertOTPVerifyParams{
@@ -115,27 +95,21 @@ func (r registerUserUseCase) Register(ctx context.Context, VerifyKey string, Ver
 			VerifyType:    sql.NullInt32{Int32: 1, Valid: true},
 		})
 		if err != nil {
-			return &common.Error{
-				DebugMessage: err.Error(),
-				Code:         ErrSendEmailOtp,
-			}
+			return response.ErrSendEmailOtp, err
 		}
 		// step8: gelatosID
 		lastIdVerifyUser, err := result.LastInsertId()
 		if err != nil {
-			return &common.Error{
-				DebugMessage: err.Error(),
-				Code:         ErrSendEmailOtp,
-			}
+			return response.ErrSendEmailOtp, err
 		}
 		log.Println("lastIdVerifyUser", lastIdVerifyUser)
-		return nil
+		return response.ErrCodeSuccess, nil
 	case user.MOBILE:
 		//TO DO
-		return nil
+		return response.ErrCodeSuccess, nil
 	default:
 		fmt.Println("unhandled default case")
 	}
 
-	return nil
+	return response.ErrCodeSuccess, nil
 }
