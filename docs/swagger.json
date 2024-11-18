@@ -1,0 +1,21 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "This is a sample server seller server.",
+        "title": "API Documentation Ecommerce Backend SHOP",
+        "termsOfService": "https://github.com/haodam/crm-backend-golang",
+        "contact": {
+            "name": "DAM ANH HAO",
+            "url": "https://github.com/haodam/crm-backend-golang",
+            "email": "example@gmail.com"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        },
+        "version": "1.0.0"
+    },
+    "host": "localhost:8002",
+    "basePath": "/v1/2024",
+    "paths": {}
+}

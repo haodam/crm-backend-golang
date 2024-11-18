@@ -1,0 +1,16 @@
+basePath: /v1/2024
+host: localhost:8002
+info:
+  contact:
+    email: example@gmail.com
+    name: DAM ANH HAO
+    url: https://github.com/haodam/crm-backend-golang
+  description: This is a sample server seller server.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: https://github.com/haodam/crm-backend-golang
+  title: API Documentation Ecommerce Backend SHOP
+  version: 1.0.0
+paths: {}
+swagger: "2.0"

@@ -25,5 +25,8 @@ run:
 sql_gen:
 	sqlc generate
 
+swagger:
+	swag init -g ./cmd/main.go -o ./docs
 
-.PHONY: run up down reset sql_gen create_migration up_by_one
+
+.PHONY: run up down reset sql_gen create_migration up_by_one swagger
