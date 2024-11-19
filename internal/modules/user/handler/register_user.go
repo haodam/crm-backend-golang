@@ -10,6 +10,17 @@ import (
 	"net/http"
 )
 
+// User Registration documentation
+// @Summary      User Registration
+// @Description  When user is registered send otp to email
+// @Tags         account management
+// @Accept       json
+// @Produce      json
+// @Param        payload body model.RegisterInput true "payload"
+// @Success      200  {object}  response.ResponseData
+// @Failure      500  {object}  response.ErrorResponseData
+// @Router       /user/register [post]
+
 func (u *userHandlerImpl) HandleUserRegister(ctx *gin.Context) {
 
 	var params req.UserRegistrationRequest
