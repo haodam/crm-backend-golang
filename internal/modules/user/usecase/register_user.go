@@ -36,7 +36,7 @@ var _ IUserRegister = (*registerUserUseCase)(nil)
 // VerifyType    int    `json:"verify_type"` 1 la dang ky bang email , 2 la dang ky bang so dt
 // VerifyPurpose string `json:"verify_purpose"` TEST_USER
 
-func (r registerUserUseCase) Register(ctx context.Context, VerifyKey string, VerifyType int, VerifyPurpose string) (codeResult int, err error) {
+func (r *registerUserUseCase) Register(ctx context.Context, VerifyKey string, VerifyType int, VerifyPurpose string) (codeResult int, err error) {
 
 	// Step1: Hash Email
 	fmt.Printf("VerifyKey: %s\n", VerifyKey)
