@@ -3,7 +3,7 @@
 //   sqlc v1.27.0
 // source: 00001_pre_go_crm_user_verify_9999.sql
 
-package database
+package repository
 
 import (
 	"context"
