@@ -8,6 +8,7 @@ import (
 
 type IUserHandler interface {
 	HandleUserRegister(ctx *gin.Context)
+	VerifyOTP(ctx *gin.Context)
 }
 
 type userHandlerImpl struct {

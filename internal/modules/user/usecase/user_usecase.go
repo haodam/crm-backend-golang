@@ -1,9 +1,14 @@
 package usecase
 
+import (
+	"context"
+	"github.com/haodam/user-backend-golang/internal/modules/user/model"
+)
+
 type (
-	IUserLogin interface {
-		//Register(ctx context.Context, req *entity.RegisterInput) *common.Error
-		//Login(ctx context.Context, arg entity.LoginInput) (codeResult int, out *entity.LoginOutput, err error)
+	IUserAuthed interface {
+		Register(ctx context.Context, arg *model.RegisterEntity) (codeResult int, err error)
+		VerifyOTP(ctx context.Context, req *model.VerifyOTPInput) (out *model.VerifyOTPOutput, err error)
 	}
 
 	IUserInfo interface {
@@ -16,12 +21,16 @@ type (
 )
 
 var (
-	localUserLogin IUserLogin
+	localUserAuthed IUserAuthed
 )
 
-func UserLogin() IUserLogin {
-	if localUserLogin == nil {
-		panic("implement localUserLogin not found for interface IUserLogin")
+func UserAuthed() IUserAuthed {
+	if localUserAuthed == nil {
+		panic("implement localUserAuthed not found for interface IUserAuthed")
 	}
-	return localUserLogin
+	return localUserAuthed
+}
+
+func InitUserAuthed(i IUserAuthed) {
+	localUserAuthed = i
 }
