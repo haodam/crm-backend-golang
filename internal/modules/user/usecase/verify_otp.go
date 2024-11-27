@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/haodam/user-backend-golang/global"
+	"github.com/haodam/user-backend-golang/internal/modules/user/model"
 	database "github.com/haodam/user-backend-golang/internal/modules/user/repository"
 	"github.com/haodam/user-backend-golang/utils/crypto"
 	string2 "github.com/haodam/user-backend-golang/utils/string"
@@ -26,10 +27,10 @@ func NewVerifyUserUseCase(d *database.Queries) IVerifyUserRegister {
 	return &verifyUserUseCase{d: d}
 }
 
-func (v *verifyUserUseCase) VerifyOTP(ctx context.Context, verifyKey string, verifyCode string) (token string, UserId string, message string, err error) {
+func (v *verifyUserUseCase) VerifyOTP(ctx context.Context, req *model.VerifyOTPInput) (result *model.VerifyOTPOutput, err error) {
 
 	// hash email
-	hashKey := crypto.GetHash(strings.ToLower(verifyKey))
+	hashKey := crypto.GetHash(strings.ToLower(req.VerifyKey))
 
 	// VD: Neu otpKey la u:123abc:otp, thi attemptKey la u:123abc:otp:attempts.
 	otpKey := string2.GetUserKey(hashKey)
@@ -50,7 +51,7 @@ func (v *verifyUserUseCase) VerifyOTP(ctx context.Context, verifyKey string, ver
 		return "", "", "", err
 	}
 
-	if verifyCode != otpFound {
+	if req.VerifyCode != otpFound {
 		_, _ = global.Rdb.Incr(ctx, attemptKey).Result()
 		_ = global.Rdb.Expire(ctx, attemptKey, time.Minute)
 		return "", "", "", fmt.Errorf("otp verification failed")
@@ -59,7 +60,7 @@ func (v *verifyUserUseCase) VerifyOTP(ctx context.Context, verifyKey string, ver
 	// Neu OTP chinh xac , xoa bo dem so lan thu
 	_ = global.Rdb.Del(ctx, attemptKey).Err()
 
-	infoOTP, err := v.d.GetInfoOTP(ctx, verifyKey)
+	infoOTP, err := v.d.GetInfoOTP(ctx, req.VerifyKey)
 	if err != nil {
 		return "", "", "", err
 	}

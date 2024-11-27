@@ -136,3 +136,4 @@ volumes:
 
 networks:
   shopdev_network:
+    driver: bridge
