@@ -1,10 +1,11 @@
 package setting
 
 type Config struct {
-	Mysql  MySQLSetting  `mapstructure:"mysql"`
-	Logger LoggerSetting `mapstructure:"logger"`
-	Redis  RedisSetting  `mapstructure:"redis"`
-	Server ServerSetting `mapstructure:"server"`
+	Mysql    MySQLSetting    `mapstructure:"mysql"`
+	Logger   LoggerSetting   `mapstructure:"logger"`
+	Redis    RedisSetting    `mapstructure:"redis"`
+	Server   ServerSetting   `mapstructure:"server"`
+	Postgres PostgresSetting `mapstructure:"postgres"`
 }
 
 type ServerSetting struct {
@@ -18,6 +19,17 @@ type MySQLSetting struct {
 	Username        string `mapstructure:"username"`
 	Password        string `mapstructure:"password"`
 	Dbname          string `mapstructure:"dbname"`
+	MaxIdleConns    int    `mapstructure:"maxIdleConns"`
+	MaxOpenConns    int    `mapstructure:"maxOpenConns"`
+	ConnMaxLifeTime int    `mapstructure:"connMaxLifeTime"`
+}
+
+type PostgresSetting struct {
+	Host            string `mapstructure:"host"`
+	Port            int    `mapstructure:"port"`
+	UserName        string `mapstructure:"username"`
+	Password        string `mapstructure:"password"`
+	Database        string `mapstructure:"dbname"`
 	MaxIdleConns    int    `mapstructure:"maxIdleConns"`
 	MaxOpenConns    int    `mapstructure:"maxOpenConns"`
 	ConnMaxLifeTime int    `mapstructure:"connMaxLifeTime"`
