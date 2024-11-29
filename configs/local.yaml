@@ -1,7 +1,8 @@
 server:
   port: 8082
   mode: "dev"
-database:
+
+database-mysql:
   host: mysql_shopdevgo #127.0.0.1
   port: 3306
   username: root
@@ -10,11 +11,24 @@ database:
   maxIdleConns: 10
   maxOpenConns: 100
   connMaxLifeTime: 3600
+
+database-postgres:
+  host: postgres_shopdevgo #127.0.0.1
+  port: 5433
+  username: root
+  password: root
+  dbname: shopdevgo2
+  maxIdleConns: 10
+  minIdeConns: 10
+  maxOpenConns: 100
+  connMaxLifeTime: 3600
+
 redis:
   host: redis_shopdevgo #127.0.0.1
   port: 6379
   password:
   database: 0
+
 logger:
   log_level: debug
   file_log_name: "./log/dev001.log"
