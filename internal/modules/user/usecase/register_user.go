@@ -19,19 +19,19 @@ import (
 	"time"
 )
 
-type IUserRegister interface {
-	Register(ctx context.Context, arg *model.RegisterEntity) (codeResult int, err error)
-}
+//type IUserRegister interface {
+//	Register(ctx context.Context, arg *model.RegisterEntity) (codeResult int, err error)
+//}
 
 type registerUserUseCase struct {
 	d *database.Queries
 }
 
-func NewRegisterUserUseCase(d *database.Queries) IUserRegister {
+func NewRegisterUserUseCase(d *database.Queries) *registerUserUseCase {
 	return &registerUserUseCase{d: d}
 }
 
-var _ IUserRegister = (*registerUserUseCase)(nil)
+//var _ IUserRegister = (*registerUserUseCase)(nil)
 
 // VerifyKey     string `json:"verify_key"` la email
 // VerifyType    int    `json:"verify_type"` 1 la dang ky bang email , 2 la dang ky bang so dt

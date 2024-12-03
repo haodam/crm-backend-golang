@@ -56,12 +56,12 @@ func (u *updatePassWordRegister) UpdatePasswordRegister(ctx context.Context, tok
 		return response.ErrCodeUserOtpNotExists, err
 	}
 
-	user_id, err := newUserBase.LastInsertId()
-	if err != nil {
-		return response.ErrCodeUserOtpNotExists, err
-	}
-
-	// add user_id to user info table
-	newUserInfo, err := u.r.AddUserBase()
+	//user_id, err := newUserBase.LastInsertId()
+	//if err != nil {
+	//	return response.ErrCodeUserOtpNotExists, err
+	//}
+	//
+	//// add user_id to user info table
+	//newUserInfo, err := u.r.AddUserBase()
 	return 0, nil
 }
