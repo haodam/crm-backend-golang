@@ -40,10 +40,10 @@ WHERE verify_key_hash = ? AND is_verified = 0
 `
 
 type GetValidOTPRow struct {
-	VerifyOtp     string
-	VerifyKeyHash string
-	VerifyKey     string
-	VerifyID      int32
+	VerifyOtp     string `json:"verify_otp"`
+	VerifyKeyHash string `json:"verify_key_hash"`
+	VerifyKey     string `json:"verify_key"`
+	VerifyID      int32  `json:"verify_id"`
 }
 
 func (q *Queries) GetValidOTP(ctx context.Context, verifyKeyHash string) (GetValidOTPRow, error) {
@@ -73,10 +73,10 @@ VALUES (?, ?, ?, ?, 0, 0, NOW(), NOW())
 `
 
 type InsertOTPVerifyParams struct {
-	VerifyOtp     string
-	VerifyKey     string
-	VerifyKeyHash string
-	VerifyType    sql.NullInt32
+	VerifyOtp     string        `json:"verify_otp"`
+	VerifyKey     string        `json:"verify_key"`
+	VerifyKeyHash string        `json:"verify_key_hash"`
+	VerifyType    sql.NullInt32 `json:"verify_type"`
 }
 
 func (q *Queries) InsertOTPVerify(ctx context.Context, arg InsertOTPVerifyParams) (sql.Result, error) {

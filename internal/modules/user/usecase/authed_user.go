@@ -5,6 +5,11 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"log"
+	"strconv"
+	"strings"
+	"time"
+
 	"github.com/haodam/user-backend-golang/global"
 	"github.com/haodam/user-backend-golang/internal/modules/user"
 	"github.com/haodam/user-backend-golang/internal/modules/user/model"
@@ -16,10 +21,6 @@ import (
 	string2 "github.com/haodam/user-backend-golang/utils/string"
 	utils "github.com/haodam/user-backend-golang/utils/string"
 	"github.com/redis/go-redis/v9"
-	"log"
-	"strconv"
-	"strings"
-	"time"
 )
 
 type sUserAuthed struct {

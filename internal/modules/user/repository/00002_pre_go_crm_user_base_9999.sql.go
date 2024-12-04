@@ -13,13 +13,14 @@ import (
 const addUserBase = `-- name: AddUserBase :execresult
 INSERT INTO pre_go_acc_user_base_9999 (
     user_account, user_password, user_salt, user_created_at, user_updated_at
-) VALUES (?, ?, ?, NOW(), NOW())
+) VALUES (?, ?, ?, NOW(), NOW()
+)
 `
 
 type AddUserBaseParams struct {
-	UserAccount  string
-	UserPassword string
-	UserSalt     string
+	UserAccount  string `json:"user_account"`
+	UserPassword string `json:"user_password"`
+	UserSalt     string `json:"user_salt"`
 }
 
 func (q *Queries) AddUserBase(ctx context.Context, arg AddUserBaseParams) (sql.Result, error) {
@@ -46,10 +47,10 @@ WHERE user_account = ?
 `
 
 type GetOneUserInfoRow struct {
-	UserID       int32
-	UserAccount  string
-	UserPassword string
-	UserSalt     string
+	UserID       int32  `json:"user_id"`
+	UserAccount  string `json:"user_account"`
+	UserPassword string `json:"user_password"`
+	UserSalt     string `json:"user_salt"`
 }
 
 func (q *Queries) GetOneUserInfo(ctx context.Context, userAccount string) (GetOneUserInfoRow, error) {
@@ -95,9 +96,9 @@ WHERE user_account = ? AND user_password = ?
 `
 
 type LoginUserBaseParams struct {
-	UserLoginIp  sql.NullString
-	UserAccount  string
-	UserPassword string
+	UserLoginIp  sql.NullString `json:"user_login_ip"`
+	UserAccount  string         `json:"user_account"`
+	UserPassword string         `json:"user_password"`
 }
 
 func (q *Queries) LoginUserBase(ctx context.Context, arg LoginUserBaseParams) error {
