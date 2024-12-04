@@ -9,6 +9,7 @@ type (
 	IUserAuthed interface {
 		Register(ctx context.Context, arg *model.RegisterEntity) (codeResult int, err error)
 		VerifyOTP(ctx context.Context, req *model.VerifyOTPInput) (out *model.VerifyOTPOutput, err error)
+		UpdatePasswordRegister(ctx context.Context, token string, Password string) (userId int, err error)
 	}
 
 	IUserInfo interface {
