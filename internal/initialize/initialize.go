@@ -25,6 +25,8 @@ func Initialize() *gin.Engine {
 	postgres.InitPostgresConnection()
 	redis.InitRedis()
 
+	ServiceInitialize()
+
 	r := InitRouter()
 	err := r.Run(":8002")
 	if err != nil {

@@ -5,10 +5,15 @@ import (
 	"github.com/haodam/user-backend-golang/common"
 	"github.com/haodam/user-backend-golang/global"
 	"github.com/haodam/user-backend-golang/internal/modules/user/model"
+	"github.com/haodam/user-backend-golang/internal/modules/user/usecase"
 	"github.com/haodam/user-backend-golang/pkg/response"
 	"go.uber.org/zap"
 	"net/http"
 )
+
+var Authed = new(authedUserHandler)
+
+type authedUserHandler struct{}
 
 // User Registration documentation
 // @Summary      User Registration
@@ -21,17 +26,14 @@ import (
 // @Failure      500  {object}  response.ErrorResponseData
 // @Router       /user/register [post]
 
-func (u *userHandlerImpl) HandleUserRegister(ctx *gin.Context) {
+func (a *authedUserHandler) HandleUserRegister(ctx *gin.Context) {
 
 	var params *model.RegisterEntity
 	if err := ctx.ShouldBindJSON(&params); err != nil {
 		common.ResponseErr(ctx, http.StatusBadRequest)
 		return
 	}
-	codeStatus, err := u.registerUserUseCase.Register(
-		ctx.Request.Context(),
-		params,
-	)
+	codeStatus, err := usecase.UserAuthed().Register(ctx, params)
 
 	if err != nil {
 		global.Logger.Error("Error registering user OTP", zap.Error(err))

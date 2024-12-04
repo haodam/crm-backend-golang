@@ -7,10 +7,6 @@ import (
 
 type RouterUser struct{}
 
-type routeUser struct {
-	userHandler handler.IUserHandler
-}
-
 func (us *RouterUser) InitUserRouter(Router *gin.RouterGroup) {
 
 	//ur := repository.NewUserRepository()
@@ -22,7 +18,7 @@ func (us *RouterUser) InitUserRouter(Router *gin.RouterGroup) {
 	// Public user
 	userRouterPublic := Router.Group("user")
 	{
-		userRouterPublic.POST("/register", nil)
+		userRouterPublic.POST("/register", handler.Authed.HandleUserRegister)
 	}
 
 	//Private user

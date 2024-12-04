@@ -6,7 +6,7 @@ import (
 	"github.com/haodam/user-backend-golang/internal/modules/user/usecase"
 )
 
-func InitializeService() {
+func ServiceInitialize() {
 	queries := repository.New(global.MdbC)
-	usecase.InitUserAuthed(usecase.NewRegisterUserUseCase(queries))
+	usecase.InitUserAuthed(usecase.NewAuthedUserUseCase(queries))
 }
