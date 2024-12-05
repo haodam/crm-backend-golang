@@ -197,12 +197,31 @@ func (s *sUserAuthed) UpdatePasswordRegister(ctx context.Context, token string, 
 		return response.ErrCodeUserOtpNotExists, err
 	}
 
-	//user_id, err := newUserBase.LastInsertId()
-	//if err != nil {
-	//	return response.ErrCodeUserOtpNotExists, err
-	//}
-	//
-	//// add user_id to user info table
-	//newUserInfo, err := u.r.AddUserBase()
-	return 0, nil
+	user_id, err := newUserBase.LastInsertId()
+	if err != nil {
+		return response.ErrCodeUserOtpNotExists, err
+	}
+
+	// add user_id to user info table
+	newUserInfo, err := s.r.AddUserHaveUserId(ctx, repository.AddUserHaveUserIdParams{
+		UserID:               uint64(user_id),
+		UserAccount:          infoOTP.VerifyKey,
+		UserNickname:         sql.NullString{String: infoOTP.VerifyKey, Valid: true},
+		UserAvatar:           sql.NullString{String: "", Valid: true},
+		UserState:            1,
+		UserMobile:           sql.NullString{String: "", Valid: true},
+		UserGender:           sql.NullInt16{Int16: 0, Valid: true},
+		UserBirthday:         sql.NullTime{Time: time.Now(), Valid: false},
+		UserEmail:            sql.NullString{String: infoOTP.VerifyKey, Valid: true},
+		UserIsAuthentication: 1,
+	})
+	if err != nil {
+		return response.ErrCodeUserOtpNotExists, err
+	}
+
+	user_id, err = newUserInfo.LastInsertId()
+	if err != nil {
+		return response.ErrCodeUserOtpNotExists, err
+	}
+	return int(user_id), nil
 }

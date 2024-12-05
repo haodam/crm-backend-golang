@@ -43,3 +43,55 @@ func (a *authedUserHandler) HandleUserRegister(ctx *gin.Context) {
 
 	response.SuccessResponse(ctx, codeStatus, nil)
 }
+
+// Verify OTP Login By User
+// @Summary      Verify OTP Login By User
+// @Description  Verify OTP Login By User
+// @Tags         account management
+// @Accept       json
+// @Produce      json
+// @Param        payload body model.VerifyInput true "payload"
+// @Success      200  {object}  response.ResponseData
+// @Failure      500  {object}  response.ErrorResponseData
+// @Router       /user/verify_account [post]
+
+func (a *authedUserHandler) HandleUserVerifyOTP(ctx *gin.Context) {
+	var params model.VerifyOTPInput
+	if err := ctx.ShouldBindJSON(&params); err != nil {
+		response.ErrorResponse(ctx, response.ErrCodeParamInvalid, err.Error())
+		return
+	}
+
+	result, err := usecase.UserAuthed().VerifyOTP(ctx, &params)
+	if err != nil {
+		global.Logger.Error("Error verifying user OTP", zap.Error(err))
+		response.ErrorResponse(ctx, response.ErrCodeParamInvalid, err.Error())
+		return
+	}
+	response.SuccessResponse(ctx, response.ErrCodeSuccess, result)
+}
+
+// UpdatePasswordRegister
+// @Summary      UpdatePasswordRegister
+// @Description  UpdatePasswordRegister
+// @Tags         account management
+// @Accept       json
+// @Produce      json
+// @Param        payload body model.UpdatePasswordRegisterInput true "payload"
+// @Success      200  {object}  response.ResponseData
+// @Failure      500  {object}  response.ErrorResponseData
+// @Router       /user/update_pass_register [post]
+
+func (a *authedUserHandler) HandleUserUpdatePasswordRegister(ctx *gin.Context) {
+	var params model.UpdatePasswordRegisterInput
+	if err := ctx.ShouldBindJSON(&params); err != nil {
+		response.ErrorResponse(ctx, response.ErrCodeParamInvalid, err.Error())
+		return
+	}
+	result, err := usecase.UserAuthed().UpdatePasswordRegister(ctx, params.UserToken, params.UserPassword)
+	if err != nil {
+		response.ErrorResponse(ctx, result, err.Error())
+		return
+	}
+	response.SuccessResponse(ctx, response.ErrCodeSuccess, result)
+}

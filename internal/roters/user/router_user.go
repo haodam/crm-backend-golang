@@ -19,6 +19,8 @@ func (us *RouterUser) InitUserRouter(Router *gin.RouterGroup) {
 	userRouterPublic := Router.Group("user")
 	{
 		userRouterPublic.POST("/register", handler.Authed.HandleUserRegister)
+		userRouterPublic.POST("/verify_user", handler.Authed.HandleUserVerifyOTP)
+		userRouterPublic.POST("/update_password_register", handler.Authed.HandleUserUpdatePasswordRegister)
 	}
 
 	//Private user
