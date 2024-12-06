@@ -95,3 +95,30 @@ func (a *authedUserHandler) HandleUserUpdatePasswordRegister(ctx *gin.Context) {
 	}
 	response.SuccessResponse(ctx, response.ErrCodeSuccess, result)
 }
+
+// User Login
+// @Summary      User Login
+// @Description  User Login
+// @Tags         account management
+// @Accept       json
+// @Produce      json
+// @Param        payload body model.LoginInput true "payload"
+// @Success      200  {object}  response.ResponseData
+// @Failure      500  {object}  response.ErrorResponseData
+// @Router       /user/login [post]
+
+func (a *authedUserHandler) Login(ctx *gin.Context) {
+	// Implement logic for login
+	var params model.LoginInput
+	if err := ctx.ShouldBindJSON(&params); err != nil {
+		response.ErrorResponse(ctx, response.ErrCodeParamInvalid, err.Error())
+		return
+	}
+
+	codeRs, dataRs, err := usecase.UserAuthed().Login(ctx, &params)
+	if err != nil {
+		response.ErrorResponse(ctx, response.ErrCodeParamInvalid, err.Error())
+		return
+	}
+	response.SuccessResponse(ctx, codeRs, dataRs)
+}

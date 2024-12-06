@@ -6,6 +6,7 @@ type Config struct {
 	Redis    RedisSetting    `mapstructure:"redis"`
 	Server   ServerSetting   `mapstructure:"server"`
 	Postgres PostgresSetting `mapstructure:"postgres"`
+	JWT      JWTSetting      `mapstructure:"jwt"`
 }
 
 type ServerSetting struct {
@@ -49,4 +50,10 @@ type LoggerSetting struct {
 	Max_age       int    `mapstructure:"max_age"`
 	Max_size      int    `mapstructure:"max_size"`
 	Compress      bool   `mapstructure:"compress"`
+}
+
+type JWTSetting struct {
+	TOKEN_HOUR_LIFESPAN uint   `mapstructure:"TOKEN_HOUR_LIFESPAN"`
+	API_SECRET_KEY      string `mapstructure:"API_SECRET_KEY"`
+	JWT_EXPIRATION      string `mapstructure:"JWT_EXPIRATION"`
 }

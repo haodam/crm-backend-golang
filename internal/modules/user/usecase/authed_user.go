@@ -3,8 +3,10 @@ package usecase
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/haodam/user-backend-golang/utils/auth"
 	"log"
 	"strconv"
 	"strings"
@@ -224,4 +226,62 @@ func (s *sUserAuthed) UpdatePasswordRegister(ctx context.Context, token string, 
 		return response.ErrCodeUserOtpNotExists, err
 	}
 	return int(user_id), nil
+}
+
+func (s *sUserAuthed) Login(ctx context.Context, req *model.LoginInput) (codeResult int, out *model.LoginOutput, err error) {
+
+	// Step1. Check user account exits in database user base
+	useBase, err := s.r.GetOneUserInfo(ctx, req.UserAccount)
+	if err != nil {
+		return response.ErrCodeAuthFailed, out, err
+	}
+
+	// Step2. Check password
+	if !crypto.MatchingPassword(useBase.UserPassword, req.UserPassword, useBase.UserSalt) {
+		return response.ErrCodeAuthFailed, out, fmt.Errorf("user password not match")
+	}
+
+	// Step3. Check two-factor authentication
+	// TO DO
+	// Step4. update password time
+	go func() {
+		err := s.r.LoginUserBase(ctx, repository.LoginUserBaseParams{
+			UserLoginIp:  sql.NullString{String: "127.0.0.1", Valid: true},
+			UserAccount:  req.UserAccount,
+			UserPassword: req.UserPassword,
+		})
+		if err != nil {
+			return
+		}
+	}()
+
+	// Step5. Create UUID user
+	subToken := string2.GenerateCliTokenUUID(int(useBase.UserID))
+	log.Println(subToken)
+
+	// Step6. Get user_info table
+	infoUser, err := s.r.GetUser(ctx, uint64(useBase.UserID))
+	if err != nil {
+		return response.ErrCodeAuthFailed, out, err
+	}
+
+	// convert to json
+	infoUserJson, err := json.Marshal(infoUser)
+	if err != nil {
+		return response.ErrCodeAuthFailed, out, fmt.Errorf("convert to json failed: %v", err)
+	}
+
+	// 7. give infoUserJson to redis with key = subToken
+	err = global.Rdb.Set(ctx, subToken, infoUserJson, time.Duration(user.TIME_2FA_OTP_REGISTER)*time.Minute).Err()
+	if err != nil {
+		return response.ErrCodeAuthFailed, out, err
+	}
+
+	// 8. create token
+	out.Token, err = auth.CreateToken(subToken)
+	if err != nil {
+		return response.ErrCodeAuthFailed, out, err
+	}
+
+	return 200, out, err
 }
