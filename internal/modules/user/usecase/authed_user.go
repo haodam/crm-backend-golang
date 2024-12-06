@@ -285,3 +285,21 @@ func (s *sUserAuthed) Login(ctx context.Context, req *model.LoginInput) (codeRes
 
 	return 200, out, err
 }
+
+// IsTwoFactorEnabled two-factor authentication
+func (s *sUserAuthed) IsTwoFactorEnabled(ctx context.Context, userId int) (codeResult int, rs bool, err error) {
+	// TO DO
+	return 0, false, err
+}
+
+// SetupTwoFactorAuth setup authentication
+func (s *sUserAuthed) SetupTwoFactorAuth(ctx context.Context, in *model.SetupTwoFactorAuthInput) (codeResult int, err error) {
+	// TO DO
+	return 0, err
+}
+
+// VerifyTwoFactorAuth Verify Two-Factor Authentication
+func (s *sUserAuthed) VerifyTwoFactorAuth(ctx context.Context, in *model.TwoFactorVerificationInput) (codeResult int, err error) {
+	// TO DO
+	return 0, err
+}
