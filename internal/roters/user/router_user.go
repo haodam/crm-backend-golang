@@ -29,6 +29,7 @@ func (us *RouterUser) InitUserRouter(Router *gin.RouterGroup) {
 	userRouterPrivate := Router.Group("user")
 	{
 		userRouterPrivate.GET("/get_info")
+		userRouterPrivate.GET("/two-factor/setup", handler.TwoFA.SetupTwoFactorAuth)
 	}
 
 }
