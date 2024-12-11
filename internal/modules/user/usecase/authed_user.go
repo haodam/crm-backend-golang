@@ -293,9 +293,37 @@ func (s *sUserAuthed) IsTwoFactorEnabled(ctx context.Context, userId int) (codeR
 }
 
 // SetupTwoFactorAuth setup authentication
-func (s *sUserAuthed) SetupTwoFactorAuth(ctx context.Context, in *model.SetupTwoFactorAuthInput) (codeResult int, err error) {
-	// TO DO
-	return 0, err
+func (s *sUserAuthed) SetupTwoFactorAuth(ctx context.Context, req *model.SetupTwoFactorAuthInput) (codeResult int, err error) {
+
+	// Step1. Check is Two FactorAuth Enabled --> true return
+	isTwoFactorAuth, err := s.r.IsTwoFactorEnabled(ctx, req.UserId)
+	if err != nil {
+		return response.ErrCodeAuthFailed, err
+	}
+
+	if isTwoFactorAuth > 0 {
+		return response.ErrCodeAuthFailed, fmt.Errorf("user already has two-factor auth")
+	}
+
+	// Step2. create new type Auth
+	err = s.r.EnableTwoFactorTypeEmail(ctx, repository.EnableTwoFactorTypeEmailParams{
+		UserID:            req.UserId,
+		TwoFactorAuthType: repository.PreGoAccUserTwoFactor9999TwoFactorAuthTypeEMAIL,
+		TwoFactorEmail:    sql.NullString{String: req.TwoFactorEmail, Valid: true},
+	})
+	if err != nil {
+		return response.ErrCodeAuthFailed, err
+	}
+
+	// Step3. Send OTP to req.TwoFactorEmail
+	keyUserTwoFator := crypto.GetHash("2fa" + strconv.Itoa(int(req.UserId)))
+	go func() {
+		err := global.Rdb.Set(ctx, keyUserTwoFator, "123456", time.Duration(user.TIME_2FA_OTP_REGISTER)*time.Minute).Err()
+		if err != nil {
+			return
+		}
+	}()
+	return response.ErrCodeSuccess, err
 }
 
 // VerifyTwoFactorAuth Verify Two-Factor Authentication
