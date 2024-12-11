@@ -316,9 +316,9 @@ func (s *sUserAuthed) SetupTwoFactorAuth(ctx context.Context, req *model.SetupTw
 	}
 
 	// Step3. Send OTP to req.TwoFactorEmail
-	keyUserTwoFator := crypto.GetHash("2fa" + strconv.Itoa(int(req.UserId)))
+	keyUserTwoFactor := crypto.GetHash("2fa" + strconv.Itoa(int(req.UserId)))
 	go func() {
-		err := global.Rdb.Set(ctx, keyUserTwoFator, "123456", time.Duration(user.TIME_2FA_OTP_REGISTER)*time.Minute).Err()
+		err := global.Rdb.Set(ctx, keyUserTwoFactor, "123456", time.Duration(user.TIME_2FA_OTP_REGISTER)*time.Minute).Err()
 		if err != nil {
 			return
 		}
