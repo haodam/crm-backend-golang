@@ -2,6 +2,7 @@ package user
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/haodam/user-backend-golang/internal/middleware"
 	"github.com/haodam/user-backend-golang/internal/modules/user/handler"
 )
 
@@ -27,6 +28,7 @@ func (us *RouterUser) InitUserRouter(Router *gin.RouterGroup) {
 
 	//Private user
 	userRouterPrivate := Router.Group("user")
+	userRouterPrivate.Use(middleware.AuthedMiddleware())
 	{
 		userRouterPrivate.GET("/get_info")
 		userRouterPrivate.GET("/two-factor/setup", handler.TwoFA.SetupTwoFactorAuth)
