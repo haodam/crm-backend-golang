@@ -286,12 +286,6 @@ func (s *sUserAuthed) Login(ctx context.Context, req *model.LoginInput) (codeRes
 	return 200, out, err
 }
 
-// IsTwoFactorEnabled two-factor authentication
-func (s *sUserAuthed) IsTwoFactorEnabled(ctx context.Context, userId int) (codeResult int, rs bool, err error) {
-	// TO DO
-	return 0, false, err
-}
-
 // SetupTwoFactorAuth setup authentication
 func (s *sUserAuthed) SetupTwoFactorAuth(ctx context.Context, req *model.SetupTwoFactorAuthInput) (codeResult int, err error) {
 
@@ -327,7 +321,47 @@ func (s *sUserAuthed) SetupTwoFactorAuth(ctx context.Context, req *model.SetupTw
 }
 
 // VerifyTwoFactorAuth Verify Two-Factor Authentication
-func (s *sUserAuthed) VerifyTwoFactorAuth(ctx context.Context, in *model.TwoFactorVerificationInput) (codeResult int, err error) {
+func (s *sUserAuthed) VerifyTwoFactorAuth(ctx context.Context, req *model.TwoFactorVerificationInput) (codeResult int, err error) {
+
+	//Step1. Check is two factor enable
+	isTwoFactorAuth, err := s.r.IsTwoFactorEnabled(ctx, req.UserId)
+	if err != nil {
+		return response.ErrCodeAuthFailed, err
+	}
+
+	if isTwoFactorAuth > 0 {
+		return response.ErrCodeAuthFailed, fmt.Errorf("user already has two-factor auth")
+	}
+	//Step2. Check OTP in redis available
+	keyUserTwoFactor := crypto.GetHash("2fa" + strconv.Itoa(int(req.UserId)))
+	otpVerifyAuth, err := global.Rdb.Get(ctx, keyUserTwoFactor).Result()
+	if errors.Is(err, redis.Nil) {
+		return response.ErrCodeTwoFactorAuthVerifyFailed, fmt.Errorf("key %s does not exists", keyUserTwoFactor)
+	} else if err != nil {
+		return response.ErrCodeTwoFactorAuthVerifyFailed, err
+	}
+	//Step3. Check OTP
+	if otpVerifyAuth == req.TwoFactorCode {
+		return response.ErrCodeTwoFactorAuthVerifyFailed, fmt.Errorf("OTP does not match")
+	}
+	//Step4. update status
+	err = s.r.UpdateTwoFactorStatus(ctx, repository.UpdateTwoFactorStatusParams{
+		UserID:            req.UserId,
+		TwoFactorAuthType: repository.PreGoAccUserTwoFactor9999TwoFactorAuthTypeEMAIL,
+	})
+	if err != nil {
+		return response.ErrCodeTwoFactorAuthVerifyFailed, err
+	}
+	//Step5. Remove OTP
+	_, err = global.Rdb.Del(ctx, keyUserTwoFactor).Result()
+	if err != nil {
+		return response.ErrCodeTwoFactorAuthVerifyFailed, err
+	}
+	return 200, nil
+}
+
+// IsTwoFactorEnabled two-factor authentication
+func (s *sUserAuthed) IsTwoFactorEnabled(ctx context.Context, userId int) (codeResult int, rs bool, err error) {
 	// TO DO
-	return 0, err
+	return 0, false, err
 }
