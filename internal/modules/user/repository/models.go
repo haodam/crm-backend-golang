@@ -64,6 +64,8 @@ type PreGoAccUserBase9999 struct {
 	UserLoginIp    sql.NullString `json:"user_login_ip"`
 	UserCreatedAt  sql.NullTime   `json:"user_created_at"`
 	UserUpdatedAt  sql.NullTime   `json:"user_updated_at"`
+	// authentication is enabled for the user base
+	IsTwoFactorEnabled sql.NullInt32 `json:"is_two_factor_enabled"`
 }
 
 // pre_go_acc_user_info_9999

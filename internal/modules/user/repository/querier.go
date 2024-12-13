@@ -31,7 +31,7 @@ type Querier interface {
 	FindUsers(ctx context.Context, arg FindUsersParams) ([]PreGoAccUserInfo9999, error)
 	GetInfoOTP(ctx context.Context, verifyKeyHash string) (PreGoAccUserVerify9999, error)
 	GetOneUserInfo(ctx context.Context, userAccount string) (GetOneUserInfoRow, error)
-	GetOneUserInfoAdmin(ctx context.Context, userAccount string) (PreGoAccUserBase9999, error)
+	GetOneUserInfoAdmin(ctx context.Context, userAccount string) (GetOneUserInfoAdminRow, error)
 	// GetTwoFactorMethodByID
 	GetTwoFactorMethodByID(ctx context.Context, twoFactorID uint32) (PreGoAccUserTwoFactor9999, error)
 	// GetTwoFactorMethodByIDAndType: select lay email de sen otp
