@@ -242,7 +242,37 @@ func (s *sUserAuthed) Login(ctx context.Context, req *model.LoginInput) (codeRes
 	}
 
 	// Step3. Check two-factor authentication
-	// TO DO
+	isTwoFactorEnable, err := s.r.IsTwoFactorEnabled(ctx, uint32(useBase.UserID))
+	if err != nil {
+		return response.ErrCodeAuthFailed, out, fmt.Errorf("does not match password")
+	}
+	if isTwoFactorEnable > 0 {
+		// Send OTP to req.TwoFactorEmail
+		keyUserLoginTwoFactor := crypto.GetHash("2fa:otp" + strconv.Itoa(int(useBase.UserID)))
+		err = global.Rdb.SetEx(ctx, keyUserLoginTwoFactor, "111111", time.Duration(user.TIME_OTP_REGISTER)*time.Minute).Err()
+		if err != nil {
+			return response.ErrCodeAuthFailed, out, fmt.Errorf("set otp redis failed")
+		}
+		// Send OTP via two factor Email
+		// get email 2FA
+		infoUserTwoFactor, err := s.r.GetTwoFactorMethodByIDAndType(ctx, repository.GetTwoFactorMethodByIDAndTypeParams{
+			UserID:            uint32(useBase.UserID),
+			TwoFactorAuthType: repository.PreGoAccUserTwoFactor9999TwoFactorAuthTypeEMAIL,
+		})
+		if err != nil {
+			return response.ErrCodeAuthFailed, out, fmt.Errorf("get two factor method failed")
+		}
+		// go send.SendEmailInJavaByAPI
+		log.Println("infoUserTwoFactor:", infoUserTwoFactor)
+		go func() {
+			err := sendto.SendTextEmailOtp([]string{infoUserTwoFactor.TwoFactorEmail.String}, user.HOST_EMAIL, "111111")
+			if err != nil {
+				return
+			}
+		}()
+		out.Message = "send OTP 2FA to Email, pls het OTP by Email..."
+		return response.ErrCodeSuccess, out, nil
+	}
 	// Step4. update password time
 	go func() {
 		err := s.r.LoginUserBase(ctx, repository.LoginUserBaseParams{
@@ -363,5 +393,5 @@ func (s *sUserAuthed) VerifyTwoFactorAuth(ctx context.Context, req *model.TwoFac
 // IsTwoFactorEnabled two-factor authentication
 func (s *sUserAuthed) IsTwoFactorEnabled(ctx context.Context, userId int) (codeResult int, rs bool, err error) {
 	// TO DO
-	return 0, false, err
+	return 0, true, err
 }
