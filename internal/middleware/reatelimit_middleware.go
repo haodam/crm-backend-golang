@@ -65,11 +65,11 @@ func (rl *RateLimiter) GlobalRateLimiter() gin.HandlerFunc {
 // PublicAPIRateLimiter applies the public API rate-limiting logic
 func (rl *RateLimiter) PublicAPIRateLimiter() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		urlPath := c.Request.URL.Path
 
+		urlPath := c.Request.URL.Path
 		// Get the appropriate limiter based on the URL path
 		limiterInstance := rl.filterLimiterUrlPath(urlPath)
-		if limiterInstance == nil {
+		if limiterInstance != nil {
 			log.Printf("No rate limiter configured for path: %s\n", urlPath)
 			c.Next()
 			return
@@ -98,12 +98,32 @@ func (rl *RateLimiter) PublicAPIRateLimiter() gin.HandlerFunc {
 	}
 }
 
-func (rl *RateLimiter) UserPrivateAPIRateLimiter() gin.HandlerFunc {
-	return func(c *gin.Context) {}
+func (rl *RateLimiter) UserAndPrivateAPIRateLimiter() gin.HandlerFunc {
+	return func(c *gin.Context) {
+
+		urlPath := c.Request.URL.Path
+		rateLimitPath := rl.filterLimiterUrlPath(urlPath)
+		if rateLimitPath != nil {
+			userID := 1001 //context.GetUserIdFromUUID()
+			key := fmt.Sprintf("%d-%s", userID, urlPath)
+			limitContext, err := rateLimitPath.Get(c, key)
+			if err != nil {
+				fmt.Println("Failed to check rate limiter for USER API.", err)
+				c.Next()
+				return
+			}
+			if limitContext.Reached {
+				log.Printf("Rate limiter is reached %s\n", key)
+				c.AbortWithStatusJSON(http.StatusTooManyRequests, gin.H{"error": "Rate limiter breached USER API."})
+				return
+			}
+		}
+	}
 }
 
 // filterLimiterUrlPath selects the appropriate rate limiter based on URL path
 func (rl *RateLimiter) filterLimiterUrlPath(urlPath string) *limiter.Limiter {
+
 	// Normalize the URL path to ensure consistent comparison
 	switch urlPath {
 	case "/v1/2024/user/login": // Ensure path starts with "/" for proper comparison
