@@ -62,14 +62,39 @@ func (rl *RateLimiter) GlobalRateLimiter() gin.HandlerFunc {
 	}
 }
 
+// PublicAPIRateLimiter applies the public API rate-limiting logic
 func (rl *RateLimiter) PublicAPIRateLimiter() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		urlPath := c.Request.URL.Path
-		rateLimitPath := rl.filterLimiterUrlPath(urlPath)
-		if limitContext.Reached {
-			fmt.Println("Rate limiter is reached")
 
+		// Get the appropriate limiter based on the URL path
+		limiterInstance := rl.filterLimiterUrlPath(urlPath)
+		if limiterInstance == nil {
+			log.Printf("No rate limiter configured for path: %s\n", urlPath)
+			c.Next()
+			return
 		}
+
+		// Use the client's IP as the key
+		clientIP := c.ClientIP() // Optionally, customize the key
+		log.Printf("Applying Public API rate limiting for path: %s and client IP: %s\n", urlPath, clientIP)
+
+		limitContext, err := limiterInstance.Get(c, clientIP)
+		if err != nil {
+			fmt.Println("Failed to check rate limiter for PUBLIC API.", err)
+			c.Next() // Allow proceeding if there is an error
+			return
+		}
+
+		if limitContext.Reached {
+			log.Printf("Public API rate limit reached for path: %s\n", urlPath)
+			c.AbortWithStatusJSON(http.StatusTooManyRequests,
+				gin.H{"error": "Rate limit exceeded for public API."})
+			return
+		}
+
+		// Allow the request if rate limit is not exceeded
+		c.Next()
 	}
 }
 
@@ -77,12 +102,18 @@ func (rl *RateLimiter) UserPrivateAPIRateLimiter() gin.HandlerFunc {
 	return func(c *gin.Context) {}
 }
 
+// filterLimiterUrlPath selects the appropriate rate limiter based on URL path
 func (rl *RateLimiter) filterLimiterUrlPath(urlPath string) *limiter.Limiter {
-	if urlPath == "v1/2024/user/login" {
+	// Normalize the URL path to ensure consistent comparison
+	switch urlPath {
+	case "/v1/2024/user/login": // Ensure path starts with "/" for proper comparison
 		return rl.publicAPIRateLimiter
-	} else if urlPath == "v1/2024/user/info" {
+
+	case "/v1/2024/user/info":
 		return rl.userPrivateAPIRateLimiter
-	} else {
+
+	default:
+		// For any other unhandled routes, use the global rate limiter
 		return rl.globalRateLimiter
 	}
 }
