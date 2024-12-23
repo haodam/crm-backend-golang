@@ -21,6 +21,7 @@ type (
 	}
 
 	IUserInfo interface {
+		SubmitInFo(ctx context.Context, req *model.TwoFactorVerificationInput) (codeResult int, err error)
 		// TODO
 	}
 
