@@ -6,7 +6,8 @@ package repository
 
 import (
 	"context"
-	"database/sql"
+
+	"github.com/jackc/pgx/v5/pgconn"
 )
 
 type Querier interface {
@@ -16,15 +17,15 @@ type Querier interface {
 	AddOrUpdatePhoneNumber(ctx context.Context, arg AddOrUpdatePhoneNumberParams) error
 	// -- name: UpdatePassword :exec
 	// UPDATE `pre_go_acc_user_info_9999` SET user_password = ? WHERE user_id = ?;
-	AddUserAutoUserId(ctx context.Context, arg AddUserAutoUserIdParams) (sql.Result, error)
-	AddUserBase(ctx context.Context, arg AddUserBaseParams) (sql.Result, error)
-	AddUserHaveUserId(ctx context.Context, arg AddUserHaveUserIdParams) (sql.Result, error)
+	AddUserAutoUserId(ctx context.Context, arg AddUserAutoUserIdParams) (pgconn.CommandTag, error)
+	AddUserBase(ctx context.Context, arg AddUserBaseParams) (pgconn.CommandTag, error)
+	AddUserHaveUserId(ctx context.Context, arg AddUserHaveUserIdParams) (pgconn.CommandTag, error)
 	CheckUserBaseExists(ctx context.Context, userAccount string) (int64, error)
 	// CountActiveTwoFactorMethods
 	CountActiveTwoFactorMethods(ctx context.Context, userID uint32) (int64, error)
 	// DisableTwoFactor
 	DisableTwoFactor(ctx context.Context, arg DisableTwoFactorParams) error
-	EditUserByUserId(ctx context.Context, arg EditUserByUserIdParams) (sql.Result, error)
+	EditUserByUserId(ctx context.Context, arg EditUserByUserIdParams) (pgconn.CommandTag, error)
 	// file: pre_go_acc_user_two_factor.sql
 	// EnableTwoFactor
 	EnableTwoFactorTypeEmail(ctx context.Context, arg EnableTwoFactorTypeEmailParams) error
@@ -43,7 +44,7 @@ type Querier interface {
 	GetUserTwoFactorMethods(ctx context.Context, userID uint32) ([]PreGoAccUserTwoFactor9999, error)
 	GetUsers(ctx context.Context, userID uint64) ([]PreGoAccUserInfo9999, error)
 	GetValidOTP(ctx context.Context, verifyKeyHash string) (GetValidOTPRow, error)
-	InsertOTPVerify(ctx context.Context, arg InsertOTPVerifyParams) (sql.Result, error)
+	InsertOTPVerify(ctx context.Context, arg InsertOTPVerifyParams) (pgconn.CommandTag, error)
 	// IsTwoFactorEnabled
 	IsTwoFactorEnabled(ctx context.Context, userID uint32) (int64, error)
 	ListUsers(ctx context.Context, arg ListUsersParams) ([]PreGoAccUserInfo9999, error)

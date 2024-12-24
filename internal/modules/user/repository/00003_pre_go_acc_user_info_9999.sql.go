@@ -8,6 +8,8 @@ package repository
 import (
 	"context"
 	"database/sql"
+
+	"github.com/jackc/pgx/v5/pgconn"
 )
 
 const addUserAutoUserId = `-- name: AddUserAutoUserId :execresult
@@ -35,8 +37,8 @@ type AddUserAutoUserIdParams struct {
 
 // -- name: UpdatePassword :exec
 // UPDATE `pre_go_acc_user_info_9999` SET user_password = ? WHERE user_id = ?;
-func (q *Queries) AddUserAutoUserId(ctx context.Context, arg AddUserAutoUserIdParams) (sql.Result, error) {
-	return q.db.ExecContext(ctx, addUserAutoUserId,
+func (q *Queries) AddUserAutoUserId(ctx context.Context, arg AddUserAutoUserIdParams) (pgconn.CommandTag, error) {
+	return q.db.Exec(ctx, addUserAutoUserId,
 		arg.UserAccount,
 		arg.UserNickname,
 		arg.UserAvatar,
@@ -70,8 +72,8 @@ type AddUserHaveUserIdParams struct {
 	UserIsAuthentication uint8          `json:"user_is_authentication"`
 }
 
-func (q *Queries) AddUserHaveUserId(ctx context.Context, arg AddUserHaveUserIdParams) (sql.Result, error) {
-	return q.db.ExecContext(ctx, addUserHaveUserId,
+func (q *Queries) AddUserHaveUserId(ctx context.Context, arg AddUserHaveUserIdParams) (pgconn.CommandTag, error) {
+	return q.db.Exec(ctx, addUserHaveUserId,
 		arg.UserID,
 		arg.UserAccount,
 		arg.UserNickname,
@@ -102,8 +104,8 @@ type EditUserByUserIdParams struct {
 	UserID       uint64         `json:"user_id"`
 }
 
-func (q *Queries) EditUserByUserId(ctx context.Context, arg EditUserByUserIdParams) (sql.Result, error) {
-	return q.db.ExecContext(ctx, editUserByUserId,
+func (q *Queries) EditUserByUserId(ctx context.Context, arg EditUserByUserIdParams) (pgconn.CommandTag, error) {
+	return q.db.Exec(ctx, editUserByUserId,
 		arg.UserNickname,
 		arg.UserAvatar,
 		arg.UserMobile,
@@ -124,7 +126,7 @@ type FindUsersParams struct {
 }
 
 func (q *Queries) FindUsers(ctx context.Context, arg FindUsersParams) ([]PreGoAccUserInfo9999, error) {
-	rows, err := q.db.QueryContext(ctx, findUsers, arg.UserAccount, arg.UserNickname)
+	rows, err := q.db.Query(ctx, findUsers, arg.UserAccount, arg.UserNickname)
 	if err != nil {
 		return nil, err
 	}
@@ -149,9 +151,6 @@ func (q *Queries) FindUsers(ctx context.Context, arg FindUsersParams) ([]PreGoAc
 			return nil, err
 		}
 		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
 	}
 	if err := rows.Err(); err != nil {
 		return nil, err
@@ -178,7 +177,7 @@ WHERE user_id = ? LIMIT 1
 `
 
 func (q *Queries) GetUser(ctx context.Context, userID uint64) (PreGoAccUserInfo9999, error) {
-	row := q.db.QueryRowContext(ctx, getUser, userID)
+	row := q.db.QueryRow(ctx, getUser, userID)
 	var i PreGoAccUserInfo9999
 	err := row.Scan(
 		&i.UserID,
@@ -215,7 +214,7 @@ WHERE user_id IN (?)
 `
 
 func (q *Queries) GetUsers(ctx context.Context, userID uint64) ([]PreGoAccUserInfo9999, error) {
-	rows, err := q.db.QueryContext(ctx, getUsers, userID)
+	rows, err := q.db.Query(ctx, getUsers, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -240,9 +239,6 @@ func (q *Queries) GetUsers(ctx context.Context, userID uint64) ([]PreGoAccUserIn
 			return nil, err
 		}
 		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
 	}
 	if err := rows.Err(); err != nil {
 		return nil, err
@@ -260,7 +256,7 @@ type ListUsersParams struct {
 }
 
 func (q *Queries) ListUsers(ctx context.Context, arg ListUsersParams) ([]PreGoAccUserInfo9999, error) {
-	rows, err := q.db.QueryContext(ctx, listUsers, arg.Limit, arg.Offset)
+	rows, err := q.db.Query(ctx, listUsers, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}
@@ -286,9 +282,6 @@ func (q *Queries) ListUsers(ctx context.Context, arg ListUsersParams) ([]PreGoAc
 		}
 		items = append(items, i)
 	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
 	if err := rows.Err(); err != nil {
 		return nil, err
 	}
@@ -300,6 +293,6 @@ DELETE FROM pre_go_acc_user_info_9999 WHERE user_id = ?
 `
 
 func (q *Queries) RemoveUser(ctx context.Context, userID uint64) error {
-	_, err := q.db.ExecContext(ctx, removeUser, userID)
+	_, err := q.db.Exec(ctx, removeUser, userID)
 	return err
 }

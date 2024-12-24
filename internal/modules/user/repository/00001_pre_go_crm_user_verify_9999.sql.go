@@ -8,6 +8,8 @@ package repository
 import (
 	"context"
 	"database/sql"
+
+	"github.com/jackc/pgx/v5/pgconn"
 )
 
 const getInfoOTP = `-- name: GetInfoOTP :one
@@ -17,7 +19,7 @@ WHERE verify_key_hash = ?
 `
 
 func (q *Queries) GetInfoOTP(ctx context.Context, verifyKeyHash string) (PreGoAccUserVerify9999, error) {
-	row := q.db.QueryRowContext(ctx, getInfoOTP, verifyKeyHash)
+	row := q.db.QueryRow(ctx, getInfoOTP, verifyKeyHash)
 	var i PreGoAccUserVerify9999
 	err := row.Scan(
 		&i.VerifyID,
@@ -47,7 +49,7 @@ type GetValidOTPRow struct {
 }
 
 func (q *Queries) GetValidOTP(ctx context.Context, verifyKeyHash string) (GetValidOTPRow, error) {
-	row := q.db.QueryRowContext(ctx, getValidOTP, verifyKeyHash)
+	row := q.db.QueryRow(ctx, getValidOTP, verifyKeyHash)
 	var i GetValidOTPRow
 	err := row.Scan(
 		&i.VerifyOtp,
@@ -79,8 +81,8 @@ type InsertOTPVerifyParams struct {
 	VerifyType    sql.NullInt32 `json:"verify_type"`
 }
 
-func (q *Queries) InsertOTPVerify(ctx context.Context, arg InsertOTPVerifyParams) (sql.Result, error) {
-	return q.db.ExecContext(ctx, insertOTPVerify,
+func (q *Queries) InsertOTPVerify(ctx context.Context, arg InsertOTPVerifyParams) (pgconn.CommandTag, error) {
+	return q.db.Exec(ctx, insertOTPVerify,
 		arg.VerifyOtp,
 		arg.VerifyKey,
 		arg.VerifyKeyHash,
@@ -97,6 +99,6 @@ WHERE verify_key_hash = ?
 
 // update lai
 func (q *Queries) UpdateUserVerificationStatus(ctx context.Context, verifyKeyHash string) error {
-	_, err := q.db.ExecContext(ctx, updateUserVerificationStatus, verifyKeyHash)
+	_, err := q.db.Exec(ctx, updateUserVerificationStatus, verifyKeyHash)
 	return err
 }

@@ -26,7 +26,7 @@ type AddOrUpdateEmailParams struct {
 
 // AddOrUpdateEmail
 func (q *Queries) AddOrUpdateEmail(ctx context.Context, arg AddOrUpdateEmailParams) error {
-	_, err := q.db.ExecContext(ctx, addOrUpdateEmail, arg.UserID, arg.TwoFactorEmail, arg.TwoFactorEmail_2)
+	_, err := q.db.Exec(ctx, addOrUpdateEmail, arg.UserID, arg.TwoFactorEmail, arg.TwoFactorEmail_2)
 	return err
 }
 
@@ -46,7 +46,7 @@ type AddOrUpdatePhoneNumberParams struct {
 
 // AddOrUpdatePhoneNumber
 func (q *Queries) AddOrUpdatePhoneNumber(ctx context.Context, arg AddOrUpdatePhoneNumberParams) error {
-	_, err := q.db.ExecContext(ctx, addOrUpdatePhoneNumber, arg.UserID, arg.TwoFactorPhone, arg.TwoFactorPhone_2)
+	_, err := q.db.Exec(ctx, addOrUpdatePhoneNumber, arg.UserID, arg.TwoFactorPhone, arg.TwoFactorPhone_2)
 	return err
 }
 
@@ -58,7 +58,7 @@ WHERE user_id = ? AND two_factor_is_active = TRUE
 
 // CountActiveTwoFactorMethods
 func (q *Queries) CountActiveTwoFactorMethods(ctx context.Context, userID uint32) (int64, error) {
-	row := q.db.QueryRowContext(ctx, countActiveTwoFactorMethods, userID)
+	row := q.db.QueryRow(ctx, countActiveTwoFactorMethods, userID)
 	var count int64
 	err := row.Scan(&count)
 	return count, err
@@ -78,7 +78,7 @@ type DisableTwoFactorParams struct {
 
 // DisableTwoFactor
 func (q *Queries) DisableTwoFactor(ctx context.Context, arg DisableTwoFactorParams) error {
-	_, err := q.db.ExecContext(ctx, disableTwoFactor, arg.UserID, arg.TwoFactorAuthType)
+	_, err := q.db.Exec(ctx, disableTwoFactor, arg.UserID, arg.TwoFactorAuthType)
 	return err
 }
 
@@ -97,7 +97,7 @@ type EnableTwoFactorTypeEmailParams struct {
 // file: pre_go_acc_user_two_factor.sql
 // EnableTwoFactor
 func (q *Queries) EnableTwoFactorTypeEmail(ctx context.Context, arg EnableTwoFactorTypeEmailParams) error {
-	_, err := q.db.ExecContext(ctx, enableTwoFactorTypeEmail, arg.UserID, arg.TwoFactorAuthType, arg.TwoFactorEmail)
+	_, err := q.db.Exec(ctx, enableTwoFactorTypeEmail, arg.UserID, arg.TwoFactorAuthType, arg.TwoFactorEmail)
 	return err
 }
 
@@ -111,7 +111,7 @@ WHERE two_factor_id = ?
 
 // GetTwoFactorMethodByID
 func (q *Queries) GetTwoFactorMethodByID(ctx context.Context, twoFactorID uint32) (PreGoAccUserTwoFactor9999, error) {
-	row := q.db.QueryRowContext(ctx, getTwoFactorMethodByID, twoFactorID)
+	row := q.db.QueryRow(ctx, getTwoFactorMethodByID, twoFactorID)
 	var i PreGoAccUserTwoFactor9999
 	err := row.Scan(
 		&i.TwoFactorID,
@@ -142,7 +142,7 @@ type GetTwoFactorMethodByIDAndTypeParams struct {
 
 // GetTwoFactorMethodByIDAndType: select lay email de sen otp
 func (q *Queries) GetTwoFactorMethodByIDAndType(ctx context.Context, arg GetTwoFactorMethodByIDAndTypeParams) (PreGoAccUserTwoFactor9999, error) {
-	row := q.db.QueryRowContext(ctx, getTwoFactorMethodByIDAndType, arg.UserID, arg.TwoFactorAuthType)
+	row := q.db.QueryRow(ctx, getTwoFactorMethodByIDAndType, arg.UserID, arg.TwoFactorAuthType)
 	var i PreGoAccUserTwoFactor9999
 	err := row.Scan(
 		&i.TwoFactorID,
@@ -171,7 +171,7 @@ type GetTwoFactorStatusParams struct {
 
 // GetTwoFactorStatus
 func (q *Queries) GetTwoFactorStatus(ctx context.Context, arg GetTwoFactorStatusParams) (bool, error) {
-	row := q.db.QueryRowContext(ctx, getTwoFactorStatus, arg.UserID, arg.TwoFactorAuthType)
+	row := q.db.QueryRow(ctx, getTwoFactorStatus, arg.UserID, arg.TwoFactorAuthType)
 	var two_factor_is_active bool
 	err := row.Scan(&two_factor_is_active)
 	return two_factor_is_active, err
@@ -187,7 +187,7 @@ WHERE user_id = ?
 
 // GetUserTwoFactorMethods
 func (q *Queries) GetUserTwoFactorMethods(ctx context.Context, userID uint32) ([]PreGoAccUserTwoFactor9999, error) {
-	rows, err := q.db.QueryContext(ctx, getUserTwoFactorMethods, userID)
+	rows, err := q.db.Query(ctx, getUserTwoFactorMethods, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -210,9 +210,6 @@ func (q *Queries) GetUserTwoFactorMethods(ctx context.Context, userID uint32) ([
 		}
 		items = append(items, i)
 	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
 	if err := rows.Err(); err != nil {
 		return nil, err
 	}
@@ -227,7 +224,7 @@ WHERE user_id = ? AND two_factor_is_active = TRUE
 
 // IsTwoFactorEnabled
 func (q *Queries) IsTwoFactorEnabled(ctx context.Context, userID uint32) (int64, error) {
-	row := q.db.QueryRowContext(ctx, isTwoFactorEnabled, userID)
+	row := q.db.QueryRow(ctx, isTwoFactorEnabled, userID)
 	var count int64
 	err := row.Scan(&count)
 	return count, err
@@ -247,7 +244,7 @@ type ReactivateTwoFactorParams struct {
 
 // ReactivateTwoFactor
 func (q *Queries) ReactivateTwoFactor(ctx context.Context, arg ReactivateTwoFactorParams) error {
-	_, err := q.db.ExecContext(ctx, reactivateTwoFactor, arg.UserID, arg.TwoFactorAuthType)
+	_, err := q.db.Exec(ctx, reactivateTwoFactor, arg.UserID, arg.TwoFactorAuthType)
 	return err
 }
 
@@ -263,7 +260,7 @@ type RemoveTwoFactorParams struct {
 
 // RemoveTwoFactor
 func (q *Queries) RemoveTwoFactor(ctx context.Context, arg RemoveTwoFactorParams) error {
-	_, err := q.db.ExecContext(ctx, removeTwoFactor, arg.UserID, arg.TwoFactorAuthType)
+	_, err := q.db.Exec(ctx, removeTwoFactor, arg.UserID, arg.TwoFactorAuthType)
 	return err
 }
 
@@ -280,7 +277,7 @@ type UpdateTwoFactorStatusParams struct {
 
 // UpdateTwoFactorStatusVerification
 func (q *Queries) UpdateTwoFactorStatus(ctx context.Context, arg UpdateTwoFactorStatusParams) error {
-	_, err := q.db.ExecContext(ctx, updateTwoFactorStatus, arg.UserID, arg.TwoFactorAuthType)
+	_, err := q.db.Exec(ctx, updateTwoFactorStatus, arg.UserID, arg.TwoFactorAuthType)
 	return err
 }
 
@@ -297,7 +294,7 @@ type VerifyTwoFactorParams struct {
 
 // VerifyTwoFactor
 func (q *Queries) VerifyTwoFactor(ctx context.Context, arg VerifyTwoFactorParams) (int64, error) {
-	row := q.db.QueryRowContext(ctx, verifyTwoFactor, arg.UserID, arg.TwoFactorAuthType)
+	row := q.db.QueryRow(ctx, verifyTwoFactor, arg.UserID, arg.TwoFactorAuthType)
 	var count int64
 	err := row.Scan(&count)
 	return count, err

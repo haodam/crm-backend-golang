@@ -8,12 +8,15 @@ package repository
 import (
 	"context"
 	"database/sql"
+
+	"github.com/jackc/pgx/v5/pgconn"
 )
 
 const addUserBase = `-- name: AddUserBase :execresult
 INSERT INTO pre_go_acc_user_base_9999 (
     user_account, user_password, user_salt, user_created_at, user_updated_at
-) VALUES (?, ?, ?, NOW(), NOW()
+) VALUES (
+    ?, ?, ?, NOW(), NOW()
 )
 `
 
@@ -23,8 +26,8 @@ type AddUserBaseParams struct {
 	UserSalt     string `json:"user_salt"`
 }
 
-func (q *Queries) AddUserBase(ctx context.Context, arg AddUserBaseParams) (sql.Result, error) {
-	return q.db.ExecContext(ctx, addUserBase, arg.UserAccount, arg.UserPassword, arg.UserSalt)
+func (q *Queries) AddUserBase(ctx context.Context, arg AddUserBaseParams) (pgconn.CommandTag, error) {
+	return q.db.Exec(ctx, addUserBase, arg.UserAccount, arg.UserPassword, arg.UserSalt)
 }
 
 const checkUserBaseExists = `-- name: CheckUserBaseExists :one
@@ -34,7 +37,7 @@ WHERE user_account = ?
 `
 
 func (q *Queries) CheckUserBaseExists(ctx context.Context, userAccount string) (int64, error) {
-	row := q.db.QueryRowContext(ctx, checkUserBaseExists, userAccount)
+	row := q.db.QueryRow(ctx, checkUserBaseExists, userAccount)
 	var count int64
 	err := row.Scan(&count)
 	return count, err
@@ -54,7 +57,7 @@ type GetOneUserInfoRow struct {
 }
 
 func (q *Queries) GetOneUserInfo(ctx context.Context, userAccount string) (GetOneUserInfoRow, error) {
-	row := q.db.QueryRowContext(ctx, getOneUserInfo, userAccount)
+	row := q.db.QueryRow(ctx, getOneUserInfo, userAccount)
 	var i GetOneUserInfoRow
 	err := row.Scan(
 		&i.UserID,
@@ -67,7 +70,7 @@ func (q *Queries) GetOneUserInfo(ctx context.Context, userAccount string) (GetOn
 
 const getOneUserInfoAdmin = `-- name: GetOneUserInfoAdmin :one
 SELECT user_id, user_account, user_password, user_salt, user_login_time, user_logout_time, user_login_ip
-     ,user_created_at, user_updated_at
+        ,user_created_at, user_updated_at
 FROM ` + "`" + `pre_go_acc_user_base_9999` + "`" + `
 WHERE user_account = ?
 `
@@ -85,7 +88,7 @@ type GetOneUserInfoAdminRow struct {
 }
 
 func (q *Queries) GetOneUserInfoAdmin(ctx context.Context, userAccount string) (GetOneUserInfoAdminRow, error) {
-	row := q.db.QueryRowContext(ctx, getOneUserInfoAdmin, userAccount)
+	row := q.db.QueryRow(ctx, getOneUserInfoAdmin, userAccount)
 	var i GetOneUserInfoAdminRow
 	err := row.Scan(
 		&i.UserID,
@@ -114,7 +117,7 @@ type LoginUserBaseParams struct {
 }
 
 func (q *Queries) LoginUserBase(ctx context.Context, arg LoginUserBaseParams) error {
-	_, err := q.db.ExecContext(ctx, loginUserBase, arg.UserLoginIp, arg.UserAccount, arg.UserPassword)
+	_, err := q.db.Exec(ctx, loginUserBase, arg.UserLoginIp, arg.UserAccount, arg.UserPassword)
 	return err
 }
 
@@ -125,6 +128,6 @@ WHERE user_account = ?
 `
 
 func (q *Queries) LogoutUserBase(ctx context.Context, userAccount string) error {
-	_, err := q.db.ExecContext(ctx, logoutUserBase, userAccount)
+	_, err := q.db.Exec(ctx, logoutUserBase, userAccount)
 	return err
 }
